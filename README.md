@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Host Monitor
 
 A real-time network monitoring tool built in **Go**, designed to track host availability, latency, uptime, and packet loss — with live updates via **WebSocket** to a dynamic **Angular** frontend.
@@ -81,6 +82,33 @@ sudo systemctl daemon-reexec
 sudo systemctl enable host-monitor
 sudo systemctl start host-monitor
 See docs/system.md
+=======
+
+
+Frontend UI
+
+The Angular-based dashboard connects to the backend WebSocket server and visualizes host metrics in real time.
+
+To run the frontend:
+
+```bash
+cd ui/
+ng serve
+Then open http://localhost:4200/ in your browser.
+
+The UI expects the WebSocket server to be available at:
+ws://localhost:8080/
+Use ng build to compile for production.
+
+Documentation
+WebSocket API
+
+Architecture Overview
+
+Docker Guide
+
+Systemd Setup
+>>>>>>> 81b8f9f (Backend)
 
 
 

@@ -1,0 +1,14 @@
+[Unit]
+Description=Host Monitoring Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/host-monitor --hosts=1.1.1.1,8.8.8.8 --port=80 --interval=5s
+WorkingDirectory=/usr/local/bin
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
