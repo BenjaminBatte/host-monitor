@@ -1,124 +1,88 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ChangeDetectorRef,
-  NgZone,
-} from '@angular/core';
-import {
-  CommonModule,
-  DatePipe,
-  DecimalPipe,
-} from '@angular/common';
-import { MetricsService } from '../../services/metrics.service';
-import { HostCardComponent } from '../host-card/host-card.component';
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="dashboard-title">🌐 Live Host Monitoring Dashboard</h1>
 
-import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
-import {
-  ChartType,
-  ChartConfiguration,
-  ChartData,
-} from 'chart.js';
+    <div class="stats-summary">
+      <div class="stat-box up">
+        <span class="stat-value">{{ getUpHostsCount() }}</span>
+        <span class="stat-label">Hosts Up</span>
+      </div>
+      <div class="stat-box down">
+        <span class="stat-value">{{ getDownHostsCount() }}</span>
+        <span class="stat-label">Hosts Down</span>
+      </div>
+      <div class="stat-box neutral">
+        <span class="stat-value">{{ hostEntries.length }}</span>
+        <span class="stat-label">Total Hosts</span>
+      </div>
+    </div>
+  </header>
 
-@Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    DecimalPipe,
-    DatePipe,
-    HostCardComponent,
-    NgChartsModule,
-  ],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
-})
-export class DashboardComponent implements OnInit {
-  hostEntries: any[] = [];
+  <div *ngIf="hostEntries.length === 0" class="loading">
+    <div class="spinner"></div>
+    <p>Connecting to WebSocket & waiting for data...</p>
+  </div>
 
-  public pieChartType: ChartType = 'pie';
-  public pieChartLabels: string[] = ['UP', 'DOWN'];
+  <div *ngIf="hostEntries.length > 0">
+    <!-- Chart -->
+    <div class="chart-container">
+      <div style="display: block;">
+       <canvas baseChart
+        [data]="pieChartData"
+        [labels]="pieChartLabels"
+        type="pie"
+        [options]="pieChartOptions">
+</canvas>
 
-  public pieChartData: ChartData<'pie'> = {
-    labels: this.pieChartLabels,
-    datasets: [
-      {
-        data: [0, 0],
-        backgroundColor: ['#2ecc71', '#e74c3c'],
-      },
-    ],
-  };
+      </div>
+    </div>
+    
 
-  public pieChartOptions: ChartConfiguration<'pie'>['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 500,
-      easing: 'easeOutQuart',
-    },
-  };
+    <!-- Host Cards -->
+    <div class="card-grid">
+      <app-host-card
+        *ngFor="let host of hostEntries"
+        [host]="host[0]"
+        [data]="host[1]">
+      </app-host-card>
+    </div>
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-
-  constructor(
-    private metricsService: MetricsService,
-    private cdr: ChangeDetectorRef,
-    private zone: NgZone
-  ) {}
-
-  ngOnInit(): void {
-    this.metricsService.getMetrics().subscribe((data) => {
-      this.zone.run(() => {
-        const newEntries = Object.entries(data);
-
-        if (!this.areHostEntriesEqual(this.hostEntries, newEntries)) {
-          this.hostEntries = newEntries;
-          this.updateChartData();
-        }
-      });
-    });
-  }
-
-  getUpHostsCount(): number {
-    return this.hostEntries.filter(([_, d]: any) => d.up).length;
-  }
-
-  getDownHostsCount(): number {
-    return this.hostEntries.filter(([_, d]: any) => !d.up).length;
-  }
-
-  private updateChartData(): void {
-    const up = this.getUpHostsCount();
-    const down = this.getDownHostsCount();
-
-    const currentData = this.pieChartData.datasets[0].data;
-
-    if (currentData[0] !== up || currentData[1] !== down) {
-      this.pieChartData.datasets[0].data = [up, down];
-      this.chart?.update(); // Force chart redraw
-    }
-  }
-
-  private areHostEntriesEqual(a: any[], b: any[]): boolean {
-    if (a.length !== b.length) return false;
-
-    for (let i = 0; i < a.length; i++) {
-      const [hostA, dataA] = a[i];
-      const [hostB, dataB] = b[i];
-
-      if (hostA !== hostB) return false;
-
-      if (
-        dataA.up !== dataB.up ||
-        dataA.latency !== dataB.latency ||
-        dataA.lastChecked !== dataB.lastChecked ||
-        dataA.successCount !== dataB.successCount ||
-        dataA.totalChecks !== dataB.totalChecks
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-}
+    <!-- History Table -->
+    <div class="history-table">
+      <h2>Recent Status History</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Host</th>
+            <th>Status</th>
+            <th>Latency</th>
+            <th>Last Checked</th>
+            <th>Uptime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let host of hostEntries">
+            <td>{{ host[0] }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="{ up: host[1].up, down: !host[1].up }">
+                {{ host[1].up ? 'UP' : 'DOWN' }}
+              </span>
+            </td>
+            <td>{{ host[1].latency }} ms</td>
+            <td>{{ host[1].lastChecked | date:'mediumTime' }}</td>
+            <td>
+              <div class="uptime-bar">
+                <div class="uptime-fill"
+                     [style.width.%]="(host[1].successCount / host[1].totalChecks) * 100">
+                </div>
+                <span>
+                  {{ (host[1].successCount / host[1].totalChecks) * 100 | number:'1.1-1' }}%
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
