@@ -1,59 +1,97 @@
-# HostMonitorUi
+# Host Monitor
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.5.
+A real-time network monitoring tool built in **Go**, designed to track host availability, latency, uptime, and packet loss — with live updates via **WebSocket** to a dynamic **Angular** frontend.
 
-## Development server
+---
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
-```
+ Monitor multiple hosts simultaneously
+Track latency, uptime percentage, and packet loss
+WebSocket server for real-time metrics streaming
+Angular UI with live charts and status dashboard
+Systemd service support
+Docker-compatible for portable deployment
+Built in **Go** 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## CLI Usage
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Run the backend with:
 
 ```bash
-ng generate --help
-```
+go run ./cmd/monitor \
+  --hosts=8.8.8.8,1.1.1.1 \
+  --port=80 \
+  --interval=5s
+--hosts: Comma-separated list of IPs or hostnames
 
-## Building
+--port: TCP port to check for reachability
 
-To build the project run:
+--interval: Frequency of pinging hosts (e.g., 5s, 10s)
 
+🌐 WebSocket API
+Endpoint: ws://localhost:8080/ws
+
+Pushes JSON data every second with host metrics
+
+See docs/api.md for full schema
+
+ Example Output (UI)
+json
+
+{
+  "8.8.8.8": {
+    "up": true,
+    "latency": 22,
+    "uptime": 99.9,
+    "packetLoss": 0
+  }
+}
+
+Project Structure
+bash
+Copy
+Edit
+host-monitor/
+├── cmd/monitor/         # CLI entrypoint
+├── internal/            # Core logic (models, services)
+├── pkg/ping/            # ICMP ping
+├── pkg/websocket/       # WebSocket broadcasting
+├── ui/                  # Angular dashboard
+├── docs/                # Documentation
+├── deployments/         # Docker + Kubernetes configs
+├── Makefile             # Build/test commands
+├── Dockerfile
+├── host-monitor.service # systemd unit file
+└── README.md
+
+Docker (Linux Only)
+docker build -t host-monitor .
+docker run --rm --network=host host-monitor \
+  --hosts=8.8.8.8,1.1.1.1 \
+  --port=80 \
+  --interval=5s
+See docs/docker.md
+
+Systemd Service (Linux)
+Install the binary and .service file, then:
+sudo systemctl daemon-reexec
+sudo systemctl enable host-monitor
+sudo systemctl start host-monitor
+See docs/system.md
+
+
+
+## ⚡ Quick Start (Manual)
+
+1. Make the helper script executable:
 ```bash
-ng build
-```
+chmod +x scripts/ping-many.sh
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Optionally run the script (example usage):
+./scripts/ping-many.sh
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Or run the monitor directly with flags:
+./host-monitor --hosts=1.1.1.1,8.8.8.8 --port=80 --interval=5s

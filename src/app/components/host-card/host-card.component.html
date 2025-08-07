@@ -1,0 +1,32 @@
+<div class="card" [ngClass]="{ up: data.up, down: !data.up }">
+  <div class="card-header">
+    <h3>{{ host }}</h3>
+    <span class="status-badge">{{ data.up ? 'UP' : 'DOWN' }}</span>
+  </div>
+  
+  <div class="metric-row">
+    <div class="metric">
+      <span class="metric-label">Latency</span>
+      <span class="metric-value">{{ data.latency }} <small>ms</small></span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">Uptime</span>
+      <span class="metric-value">{{ (data.successCount / data.totalChecks) * 100 | number:'1.1-1' }}<small>%</small></span>
+    </div>
+  </div>
+  
+  <div class="progress-container">
+    <div class="progress-bar" [style.width.%]="(data.successCount / data.totalChecks) * 100"></div>
+  </div>
+  
+  <div class="card-footer">
+    <div class="footer-item">
+      <span class="footer-label">Checks</span>
+      <span class="footer-value">{{ data.totalChecks }}</span>
+    </div>
+    <div class="footer-item">
+      <span class="footer-label">Last Check</span>
+      <span class="footer-value">{{ data.lastChecked | date:'shortTime' }}</span>
+    </div>
+  </div>
+</div>

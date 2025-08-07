@@ -1,0 +1,129 @@
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-left: 6px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.up {
+    border-color: #2ecc71;
+
+    .progress-bar {
+      background: linear-gradient(90deg, #2ecc71, #27ae60);
+    }
+  }
+
+  &.down {
+    border-color: #e74c3c;
+
+    .progress-bar {
+      background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    .up & {
+      background-color: #e8f5e9;
+      color: #2ecc71;
+    }
+
+    .down & {
+      background-color: #ffebee;
+      color: #e74c3c;
+    }
+  }
+}
+
+.metric-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.metric {
+  flex: 1;
+  text-align: center;
+
+  .metric-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 0.25rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+
+    small {
+      font-size: 0.9rem;
+      color: #95a5a6;
+    }
+  }
+}
+
+.progress-container {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+  margin-top: auto;
+
+  .footer-item {
+    text-align: center;
+
+    .footer-label {
+      display: block;
+      font-size: 0.7rem;
+      color: #95a5a6;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .footer-value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #34495e;
+    }
+  }
+}
