@@ -6,13 +6,11 @@ import (
 	"time"
 )
 
-// MonitorService performs periodic TCP checks and stores metrics.
 type MonitorService struct {
 	hosts   []string
 	metrics *MetricsStore
 }
 
-// NewMonitorService creates a new MonitorService with a list of hosts.
 func NewMonitorService(hosts []string) *MonitorService {
 	return &MonitorService{
 		hosts:   hosts,
@@ -20,7 +18,6 @@ func NewMonitorService(hosts []string) *MonitorService {
 	}
 }
 
-// CheckHost performs a one-time TCP dial to check host availability.
 func (m *MonitorService) CheckHost(host string, port int) (string, time.Duration, error) {
 	address := fmt.Sprintf("%s:%d", host, port)
 	start := time.Now()
@@ -61,7 +58,6 @@ func (m *MonitorService) Start(port int, interval time.Duration) {
 	select {} // block forever
 }
 
-// GetMetricsStore returns the metrics store as a MetricsReader interface.
 func (m *MonitorService) GetMetricsStore() MetricsReader {
 	return m.metrics
 }

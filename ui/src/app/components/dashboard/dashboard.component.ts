@@ -1,39 +1,34 @@
 import {
   Component,
   OnInit,
-  ViewChild,
   ChangeDetectorRef,
   NgZone,
+  ViewChild,
 } from '@angular/core';
 import {
   CommonModule,
   DatePipe,
-  DecimalPipe,
   NgClass,
-  NgFor,
-  NgIf,
+  DecimalPipe,
 } from '@angular/common';
-import { MetricsService } from '../../services/metrics.service';
 import { HostCardComponent } from '../host-card/host-card.component';
-
 import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
 import {
-  ChartType,
   ChartConfiguration,
   ChartData,
+  ChartType,
 } from 'chart.js';
+import { MetricsService } from '../../services/metrics.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    NgIf,
-    NgFor,
+    HostCardComponent,
     NgClass,
     DecimalPipe,
     DatePipe,
-    HostCardComponent,
     NgChartsModule,
   ],
   templateUrl: './dashboard.component.html',
@@ -41,7 +36,7 @@ import {
 })
 export class DashboardComponent implements OnInit {
   hostEntries: any[] = [];
-
+ isCompactMode = false; 
   public pieChartType: ChartType = 'pie';
   public pieChartLabels: string[] = ['UP', 'DOWN'];
 
@@ -93,6 +88,41 @@ export class DashboardComponent implements OnInit {
     return this.hostEntries.filter(([_, d]: any) => !d.up).length;
   }
 
+  exportToCSV(): void {
+    const headers = [
+      'Host',
+      'Status',
+      'Latency (ms)',
+      'Uptime (%)',
+      'Total Checks',
+      'Successful Checks',
+      'Last Checked',
+    ];
+
+    const rows = this.hostEntries.map(([host, data]) => [
+      `"${host.replace(/"/g, '""')}"`,
+      data.up ? 'UP' : 'DOWN',
+      data.latency ?? 'N/A',
+      ((data.successCount / (data.totalChecks || 1)) * 100).toFixed(1),
+      data.totalChecks || 0,
+      data.successCount || 0,
+      `"${data.lastChecked ? new Date(data.lastChecked).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A'}"`,
+
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `host_status_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   private updateChartData(): void {
     const up = this.getUpHostsCount();
     const down = this.getDownHostsCount();
@@ -101,8 +131,6 @@ export class DashboardComponent implements OnInit {
 
     if (currentData[0] !== up || currentData[1] !== down) {
       this.pieChartData.datasets[0].data = [up, down];
-
-     
       this.chart?.update();
     }
   }

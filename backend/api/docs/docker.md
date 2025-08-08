@@ -20,12 +20,10 @@ From the project root (`host-monitor/`), run:
 docker build -t host-monitor .
 This uses the Dockerfile in the root directory to compile the Go backend into a minimal container.
 
-🚀 2. Run the Container (with Host Networking)
+2. Run the Container (with Host Networking)
 Use the following command to start the monitor service:
 
-bash
-Copy
-Edit
+
 docker run --rm \
   --network=host \
   host-monitor \
@@ -44,9 +42,7 @@ Ensures consistent ping and port behavior as if running natively.
 🔁 Example Use Case
 Monitor a set of production endpoints from a Linux server:
 
-bash
-Copy
-Edit
+
 docker run --rm \
   --network=host \
   host-monitor \
@@ -56,9 +52,7 @@ docker run --rm \
 🧹 Cleanup
 To stop the container (if running detached):
 
-bash
-Copy
-Edit
+
 docker ps
 docker stop <container_id>
 To remove the image:

@@ -13,23 +13,19 @@ func TestRunWithValidConfig(t *testing.T) {
 		Hosts:    []string{"127.0.0.1"},
 		Port:     80,
 		Interval: 1 * time.Second,
-		WSPort:   ":8090", // avoid clashing with other tests
+		WSPort:   ":8090",
 	}
 
-	// Use a cancellable context to shut down after test
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Run the server and monitoring in a goroutine
 	go Run(ctx, cfg)
 
-	// Let it run briefly to initialize
 	time.Sleep(2 * time.Second)
 
-	// Cancel context to stop broadcasting gracefully
 	cancel()
 
-	// wait a bit after cancellation to allow cleanup
+	// Allow some time for the server to shut down gracefully
 	time.Sleep(500 * time.Millisecond)
 }
 

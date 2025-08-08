@@ -47,14 +47,14 @@ The Host Monitor system is designed to continuously monitor the availability and
 [WebSocket Server]
         ↓
 [Angular UI Client]
-⚙️ Deployment Options
+Deployment Options
 Systemd: Use host-monitor.service to run as a background Linux service
 
 Docker: Containerize the backend for portability
 
 Kubernetes (Optional): Helm charts or manifest files included in deployments/kubernetes/
 
-📁 Directory Structure (Key Folders)
+Directory Structure (Key Folders)
 
 host-monitor/
 ├── cmd/monitor/         # Go entrypoint

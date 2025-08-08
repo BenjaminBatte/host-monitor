@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Unique list of websites (130+ legit sites, no duplicates)
+
 HOSTS="actiontarget.com,google.com,apple.com,facebook.com,
 amazon.com,microsoft.com,cloudflare.com,openai.com,
 github.com,linkedin.com,youtube.com,twitter.com,
