@@ -1,18 +1,17 @@
-
-FROM golang:1.24.6-alpine
-
+FROM golang:1.21-alpine
 
 WORKDIR /app
 
-
-COPY go.mod go.sum ./
-RUN go mod download
-
+# Install bash (for running scripts)
+RUN apk add --no-cache bash
 
 COPY . .
 
-
 RUN go build -o host-monitor ./cmd/monitor
 
+# Expose backend port (for WebSocket)
+EXPOSE 8080
 
-CMD ["./host-monitor", "--hosts=1.1.1.1,8.8.8.8", "--port=80", "--interval=5s"]
+# Default to running the ping-many script
+RUN chmod +x ./scripts/ping-many.sh
+CMD ["./scripts/ping-many.sh"]

@@ -10,25 +10,33 @@ import (
 	"time"
 
 	"github.com/BenjaminBatte/host-monitor/internal/models"
+	"github.com/BenjaminBatte/host-monitor/internal/services"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 )
 
-// --- Mock MetricsReader --- //
 type mockMetricsStore struct {
 	mu      sync.Mutex
 	metrics map[string]*models.HostMetrics
 }
 
-func (m *mockMetricsStore) All() map[string]models.HostMetrics {
+var _ services.MetricsReader = (*mockMetricsStore)(nil)
+
+func (m *mockMetricsStore) Get(host string) *models.HostMetrics {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.metrics[host]
+}
+
+func (m *mockMetricsStore) All() map[string]*models.HostMetrics {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	result := make(map[string]models.HostMetrics)
+	out := make(map[string]*models.HostMetrics, len(m.metrics))
 	for k, v := range m.metrics {
-		result[k] = *v
+		out[k] = v
 	}
-	return result
+	return out
 }
 
 func newMockMetricsStore() *mockMetricsStore {
@@ -46,7 +54,6 @@ func newMockMetricsStore() *mockMetricsStore {
 	}
 }
 
-// --- Test --- //
 func TestWebSocketBroadcastsMetrics(t *testing.T) {
 	store := newMockMetricsStore()
 	server := NewWebSocketServer(store)
@@ -62,7 +69,6 @@ func TestWebSocketBroadcastsMetrics(t *testing.T) {
 	assert.NoError(t, err)
 	defer wsConn.Close()
 
-	// Set timeout and wait for broadcast
 	wsConn.SetReadDeadline(time.Now().Add(3 * time.Second))
 	go server.StartBroadcasting(ctx)
 	time.Sleep(1500 * time.Millisecond)

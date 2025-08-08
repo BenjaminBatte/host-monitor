@@ -30,6 +30,23 @@
     <div class="spinner"></div>
     <p>Connecting to WebSocket & waiting for data...</p>
   </div>
+<div class="threshold-settings">
+  <label for="thresholdSlider" title="Slide to increase or decrease the latency threshold">
+    Latency Threshold: {{ threshold }} ms
+  </label>
+
+  <input
+    type="range"
+    id="thresholdSlider"
+    [(ngModel)]="threshold"
+    min="1"
+    max="1000"
+    class="threshold-slider"
+    (input)="updateThreshold()"
+    title="Adjust to change latency threshold"
+  />
+</div>
+
 
   <div *ngIf="hostEntries.length > 0">
     <!-- Chart -->

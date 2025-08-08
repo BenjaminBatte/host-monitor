@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BenjaminBatte/host-monitor/internal/config"
+	threshold "github.com/BenjaminBatte/host-monitor/internal/handlers"
 	"github.com/BenjaminBatte/host-monitor/internal/services"
 	ws "github.com/BenjaminBatte/host-monitor/pkg/websocket"
 )
@@ -42,25 +44,39 @@ func parseFlags() *Config {
 	}
 }
 
+// startConfigReloader loads and periodically reloads the settings
+func startConfigReloader() {
+	if err := config.LoadSettings(); err != nil {
+		fmt.Printf("Failed to load settings: %v\n", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
+			if err := config.LoadSettings(); err != nil {
+				fmt.Printf("Error reloading settings: %v\n", err)
+			}
+		}
+	}()
+}
+
 // Run initializes and starts the monitor and WebSocket server
 func Run(ctx context.Context, cfg *Config) {
 	monitor := services.NewMonitorService(cfg.Hosts)
 	server := ws.NewWebSocketServer(monitor.GetMetricsStore())
 
-	// Create a mux and register the WebSocket handler
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", server.HandleConnections)
+	mux.HandleFunc("/api/threshold", threshold.ThresholdHandler)
 
-	// Define an HTTP server with shutdown capability
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0" + cfg.WSPort,
 		Handler: mux,
 	}
 
-	// Start broadcasting (respects context)
 	go server.StartBroadcasting(ctx)
 
-	// Start the HTTP server
 	go func() {
 		fmt.Printf("WebSocket server started on %s\n", cfg.WSPort)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -68,15 +84,12 @@ func Run(ctx context.Context, cfg *Config) {
 		}
 	}()
 
-	// Start monitoring
 	fmt.Printf("Monitoring hosts: %v every %v on port %d\n", cfg.Hosts, cfg.Interval, cfg.Port)
 	go monitor.Start(cfg.Port, cfg.Interval)
 
-	// Wait for Ctrl+C (context cancellation)
 	<-ctx.Done()
 	fmt.Println("\n[Shutdown] Signal received. Cleaning up...")
 
-	// Shutdown the HTTP server gracefully
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -92,6 +105,8 @@ func main() {
 	if cfg == nil {
 		return
 	}
+
+	startConfigReloader()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
