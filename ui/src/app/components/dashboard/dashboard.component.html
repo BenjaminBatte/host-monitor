@@ -1,0 +1,88 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="dashboard-title">🌐 Live Host Monitoring Dashboard</h1>
+
+    <div class="stats-summary">
+      <div class="stat-box up">
+        <span class="stat-value">{{ getUpHostsCount() }}</span>
+        <span class="stat-label">Hosts Up</span>
+      </div>
+      <div class="stat-box down">
+        <span class="stat-value">{{ getDownHostsCount() }}</span>
+        <span class="stat-label">Hosts Down</span>
+      </div>
+      <div class="stat-box neutral">
+        <span class="stat-value">{{ hostEntries.length }}</span>
+        <span class="stat-label">Total Hosts</span>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="hostEntries.length === 0" class="loading">
+    <div class="spinner"></div>
+    <p>Connecting to WebSocket & waiting for data...</p>
+  </div>
+
+  <div *ngIf="hostEntries.length > 0">
+    <!-- Chart -->
+    <div class="chart-container">
+      <div style="display: block;">
+       <canvas baseChart
+        [data]="pieChartData"
+        [labels]="pieChartLabels"
+        type="pie"
+        [options]="pieChartOptions">
+</canvas>
+
+      </div>
+    </div>
+    
+
+    <!-- Host Cards -->
+    <div class="card-grid">
+      <app-host-card
+        *ngFor="let host of hostEntries"
+        [host]="host[0]"
+        [data]="host[1]">
+      </app-host-card>
+    </div>
+
+    <!-- History Table -->
+    <div class="history-table">
+      <h2>Recent Status History</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Host</th>
+            <th>Status</th>
+            <th>Latency</th>
+            <th>Last Checked</th>
+            <th>Uptime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let host of hostEntries">
+            <td>{{ host[0] }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="{ up: host[1].up, down: !host[1].up }">
+                {{ host[1].up ? 'UP' : 'DOWN' }}
+              </span>
+            </td>
+            <td>{{ host[1].latency }} ms</td>
+            <td>{{ host[1].lastChecked | date:'mediumTime' }}</td>
+            <td>
+              <div class="uptime-bar">
+                <div class="uptime-fill"
+                     [style.width.%]="(host[1].successCount / host[1].totalChecks) * 100">
+                </div>
+                <span>
+                  {{ (host[1].successCount / host[1].totalChecks) * 100 | number:'1.1-1' }}%
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
