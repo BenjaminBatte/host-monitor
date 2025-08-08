@@ -8,7 +8,7 @@ import { retryWhen, delayWhen, tap, shareReplay } from 'rxjs/operators';
 })
 export class MetricsService {
   private socket$: WebSocketSubject<any> | null = null;
-  private readonly WS_URL = 'ws://localhost:8080/ws'; // Replace with your actual WebSocket URL
+  private readonly WS_URL = 'ws://localhost:8080/ws'; 
 
   private connect(): WebSocketSubject<any> {
     return webSocket({

@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"encoding/json"
-	"log"
+	"context"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -12,77 +12,60 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow all origins for dev/demo
-	},
-}
-
 type WebSocketServer struct {
-	clients   map[*websocket.Conn]bool
-	metrics   *services.MetricsStore
-	broadcast chan []byte
-	mu        sync.Mutex
+	metricsReader services.MetricsReader
+	clients       map[*websocket.Conn]bool
+	mu            sync.Mutex
 }
 
-func NewWebSocketServer(metrics *services.MetricsStore) *WebSocketServer {
+func NewWebSocketServer(reader services.MetricsReader) *WebSocketServer {
 	return &WebSocketServer{
-		clients:   make(map[*websocket.Conn]bool),
-		metrics:   metrics,
-		broadcast: make(chan []byte),
+		metricsReader: reader,
+		clients:       make(map[*websocket.Conn]bool),
 	}
 }
 
-func (ws *WebSocketServer) HandleConnections(w http.ResponseWriter, r *http.Request) {
+func (s *WebSocketServer) HandleConnections(w http.ResponseWriter, r *http.Request) {
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("WebSocket upgrade error: %v", err)
+		fmt.Printf("WebSocket upgrade failed: %v\n", err)
 		return
 	}
-	defer conn.Close()
 
-	ws.mu.Lock()
-	ws.clients[conn] = true
-	ws.mu.Unlock()
-
-	for {
-		_, _, err := conn.ReadMessage()
-		if err != nil {
-			ws.mu.Lock()
-			delete(ws.clients, conn)
-			ws.mu.Unlock()
-			break
-		}
-	}
+	s.mu.Lock()
+	s.clients[conn] = true
+	s.mu.Unlock()
 }
 
-func (ws *WebSocketServer) StartBroadcasting() {
+func (s *WebSocketServer) StartBroadcasting(ctx context.Context) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		rawMetrics := ws.metrics.All()
-		transformed := make(map[string]models.HostMetricsDTO)
-
-		for host, m := range rawMetrics {
-			transformed[host] = m.ToDTO()
-		}
-
-		jsonData, err := json.Marshal(transformed)
-		if err != nil {
-			log.Printf("Failed to marshal metrics: %v", err)
-			continue
-		}
-
-		ws.mu.Lock()
-		for client := range ws.clients {
-			err := client.WriteMessage(websocket.TextMessage, jsonData)
-			if err != nil {
-				log.Printf("WebSocket send error: %v", err)
-				client.Close()
-				delete(ws.clients, client)
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			raw := s.metricsReader.All()
+			data := make(map[string]models.HostMetricsDTO)
+			for k, v := range raw {
+				data[k] = v.ToDTO()
 			}
+
+			s.mu.Lock()
+			for client := range s.clients {
+				err := client.WriteJSON(data)
+				if err != nil {
+					client.Close()
+					delete(s.clients, client)
+				}
+			}
+			s.mu.Unlock()
 		}
-		ws.mu.Unlock()
 	}
 }

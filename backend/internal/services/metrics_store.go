@@ -42,13 +42,13 @@ func (ms *MetricsStore) Get(host string) *models.HostMetrics {
 	return ms.metrics[host]
 }
 
-func (ms *MetricsStore) All() map[string]*models.HostMetrics {
+func (ms *MetricsStore) All() map[string]models.HostMetrics {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
 
-	result := make(map[string]*models.HostMetrics)
+	result := make(map[string]models.HostMetrics)
 	for k, v := range ms.metrics {
-		result[k] = v
+		result[k] = *v
 	}
 	return result
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// HostStatus represents whether a host is UP or DOWN.
 type HostStatus string
 
 const (
@@ -12,6 +13,7 @@ const (
 	StatusDown HostStatus = "DOWN"
 )
 
+// HostMetrics holds live monitoring data for a single host.
 type HostMetrics struct {
 	Host           string
 	LatencyHistory []time.Duration
@@ -22,13 +24,14 @@ type HostMetrics struct {
 	mu             sync.Mutex
 }
 
+// AddResult records a new health check result for the host.
 func (hm *HostMetrics) AddResult(latency time.Duration, status HostStatus) {
 	hm.mu.Lock()
 	defer hm.mu.Unlock()
 
 	hm.LatencyHistory = append(hm.LatencyHistory, latency)
 	if len(hm.LatencyHistory) > 100 {
-		hm.LatencyHistory = hm.LatencyHistory[1:] // keep last 100 samples
+		hm.LatencyHistory = hm.LatencyHistory[1:] // Keep only the last 100 entries
 	}
 
 	if status == StatusUp {
@@ -38,17 +41,19 @@ func (hm *HostMetrics) AddResult(latency time.Duration, status HostStatus) {
 	}
 
 	hm.LastStatus = status
-	hm.LastChecked = time.Now()
+	hm.LastChecked = time.Now().UTC()
 }
 
+// HostMetricsDTO is a serialized view of host metrics for WebSocket clients.
 type HostMetricsDTO struct {
 	Latency      float64 `json:"latency"`
 	Up           bool    `json:"up"`
 	TotalChecks  int     `json:"totalChecks"`
 	SuccessCount int     `json:"successCount"`
-	LastChecked  string  `json:"lastChecked"`
+	LastChecked  string  `json:"lastChecked,omitempty"`
 }
 
+// ToDTO safely converts HostMetrics to a DTO for transmission.
 func (hm *HostMetrics) ToDTO() HostMetricsDTO {
 	hm.mu.Lock()
 	defer hm.mu.Unlock()
