@@ -42,11 +42,12 @@ func (hm *HostMetrics) AddResult(latency time.Duration, status HostStatus) {
 }
 
 type HostMetricsDTO struct {
-	Latency      float64 `json:"latency"`
-	Up           bool    `json:"up"`
-	TotalChecks  int     `json:"totalChecks"`
-	SuccessCount int     `json:"successCount"`
-	LastChecked  string  `json:"lastChecked,omitempty"`
+	Latency        float64   `json:"latency"`
+	Up             bool      `json:"up"`
+	TotalChecks    int       `json:"totalChecks"`
+	SuccessCount   int       `json:"successCount"`
+	LastChecked    string    `json:"lastChecked,omitempty"`
+	LatencyHistory []float64 `json:"latencyHistory"`
 }
 
 func (hm *HostMetrics) ToDTO() HostMetricsDTO {
@@ -57,6 +58,12 @@ func (hm *HostMetrics) ToDTO() HostMetricsDTO {
 	if len(hm.LatencyHistory) > 0 {
 		latency = float64(hm.LatencyHistory[len(hm.LatencyHistory)-1].Milliseconds())
 	}
+
+	latencyHistory := make([]float64, len(hm.LatencyHistory))
+	for i, d := range hm.LatencyHistory {
+		latencyHistory[i] = float64(d.Milliseconds())
+	}
+
 	total := hm.UpCount + hm.DownCount
 	lastChecked := ""
 	if !hm.LastChecked.IsZero() {
@@ -64,10 +71,11 @@ func (hm *HostMetrics) ToDTO() HostMetricsDTO {
 	}
 
 	return HostMetricsDTO{
-		Latency:      latency,
-		Up:           hm.LastStatus == StatusUp,
-		TotalChecks:  total,
-		SuccessCount: hm.UpCount,
-		LastChecked:  lastChecked,
+		Latency:        latency,
+		Up:             hm.LastStatus == StatusUp,
+		TotalChecks:    total,
+		SuccessCount:   hm.UpCount,
+		LastChecked:    lastChecked,
+		LatencyHistory: latencyHistory,
 	}
 }

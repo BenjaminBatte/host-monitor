@@ -172,3 +172,10 @@
   90% { opacity: 1; }
   100% { opacity: 0; }
 }
+.latency-chart {
+  height: 100px;
+  margin-top: 8px;
+}
+canvas {
+  width: 100% !important;
+}
