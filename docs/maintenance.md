@@ -1,7 +1,8 @@
-[⬅ Back to Home](./)
 ---
 
 ## title: Maintenance
+
+[⬅ Back to Home](./) | [⬅ Back to Usage](usage.md)
 
 # Maintenance
 
@@ -11,6 +12,7 @@
 
   * Update `config/settings.json` (e.g., `"hosts": ["8.8.8.8","1.1.1.1"]`).
   * The backend reloads settings periodically (no restart needed). If changes don’t apply, restart the service.
+
 * **Latency Threshold**
 
   * Modify `"latencyThresholdMs"` in `config/settings.json` or adjust via the UI.
@@ -50,4 +52,6 @@ make ui-build     # builds Angular UI
 jq . config/settings.json >/dev/null
 ```
 
-[⬅ Back to Home](./)
+---
+
+[⬅ Back to Home](./) | [⬅ Back to Usage](usage.md)

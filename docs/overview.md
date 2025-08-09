@@ -1,7 +1,8 @@
-[⬅ Back to Home](./) | [Next → Architecture](architecture.md)
 ---
 
 ## title: Overview
+
+[⬅ Back to Home](./) | [Next → Architecture](architecture.md)
 
 # Overview
 
@@ -35,5 +36,7 @@ This documentation is intended for:
 
 * **Developers** — who want to understand, extend, or maintain the codebase.
 * **Operators** — who deploy, configure, and monitor the application in production.
+
+---
 
 [⬅ Back to Home](./) | [Next → Architecture](architecture.md)

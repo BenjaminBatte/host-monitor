@@ -1,9 +1,12 @@
-[⬅ Back to Home](./) | [Next → Overview](overview.md)
----
-title: Technology Choices
 ---
 
-## Why Go (Golang) over C#
+## title: Technology Choices
+
+[⬅ Back to Home](./) | [Next → Overview](overview.md)
+
+# Technology Choices
+
+## Why Go (Golang) over C\#
 
 * **Performance and Efficiency** – Go is compiled, statically typed, and known for fast startup times and low memory usage, making it well-suited for a network monitoring tool.
 * **Concurrency Model** – Go’s goroutines and channels provide lightweight, built-in concurrency, ideal for handling multiple host pings in parallel.

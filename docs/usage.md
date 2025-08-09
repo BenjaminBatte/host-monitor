@@ -1,7 +1,8 @@
-[⬅ Back to Setup](setup.md) | [Next → Maintenance](maintenance.md)
 ---
 title: Usage
 ---
+
+[⬅ Back to Setup](setup.md) | [Next → Maintenance](maintenance.md)
 
 # Usage
 
