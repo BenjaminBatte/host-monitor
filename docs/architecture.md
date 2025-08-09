@@ -1,4 +1,4 @@
-                                                                    [⬅ Back to Home](./) | [Next → Usage](usage.md)
+[⬅ Back to Home](./) | [Next → Usage](usage.md)
 ---
 
 ## title: Architecture
