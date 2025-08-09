@@ -1,22 +1,26 @@
 ---
-title: Maintenance
----
+
+## title: Maintenance
 
 # Maintenance
 
 ## Routine Tasks
-- **Add/Remove Hosts**
-  - Update `config/settings.json` (e.g., `"hosts": ["8.8.8.8","1.1.1.1"]`).
-  - The backend reloads settings periodically (no restart needed). If changes don’t apply, restart the service.
-- **Latency Threshold**
-  - Modify `"latencyThresholdMs"` in `config/settings.json` or adjust via the UI.
-  - The backend reloads this value automatically (used to mark hosts DOWN when latency exceeds the threshold).
+
+* **Add/Remove Hosts**
+
+  * Update `config/settings.json` (e.g., `"hosts": ["8.8.8.8","1.1.1.1"]`).
+  * The backend reloads settings periodically (no restart needed). If changes don’t apply, restart the service.
+* **Latency Threshold**
+
+  * Modify `"latencyThresholdMs"` in `config/settings.json` or adjust via the UI.
+  * The backend reloads this value automatically (used to mark hosts DOWN when latency exceeds the threshold).
 
 ---
 
 ## Service Management
 
 ### systemd (Linux) & Docker
+
 ```bash
 # status / logs
 sudo systemctl status host-monitor
@@ -43,6 +47,6 @@ make ui-build     # builds Angular UI
 
 # validate settings.json syntax
 jq . config/settings.json >/dev/null
-
 ```
+
 [⬅ Back to Home](./)
