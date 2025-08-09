@@ -2,6 +2,8 @@
 title: Host Monitor Documentation
 ---
 
+[Start → Overview](overview.md)
+
 # 📡 Host Monitor
 > A lightweight, real-time host monitoring tool with a Go backend, Angular dashboard, and WebSocket updates.
 
@@ -21,3 +23,5 @@ title: Host Monitor Documentation
 6. [Technology Choices](tech.md) – Rationale behind Go, Angular, WebSockets, and Docker.
 
 ---
+
+[Start → Overview](overview.md)
