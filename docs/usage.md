@@ -14,6 +14,8 @@ Once the Host Monitor service is running:
 
 * **Configure Hosts & Thresholds:**
   Use the **Settings Panel** to add/remove hosts or adjust the latency threshold. Changes are applied live without restarting the backend.
+  
+    ![Export CSV Example](images/slide.png)
 
 * **Visual Insights:**
   Review at-a-glance host status cards, uptime pie charts, and latency trend charts.
