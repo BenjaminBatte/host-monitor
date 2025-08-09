@@ -1,10 +1,11 @@
 ---
-
-## title: Overview
+title: Overview
+---
 
 [⬅ Back to Home](./) | [Next → Architecture](architecture.md)
 
 # Overview
+
 
 **Host Monitor** is a real-time host and service monitoring tool built as part of a skills assessment project.
 It is designed to run on Linux, track network host availability, and present live metrics through a modern web dashboard.
