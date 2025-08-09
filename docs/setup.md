@@ -1,5 +1,5 @@
 ---
-
+[⬅ Back to Home](./) | [Next → Usage](usage.md)
 ## title: Setup
 
 # Setup

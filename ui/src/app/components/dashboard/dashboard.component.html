@@ -1,8 +1,11 @@
+<div id="top"></div>
+
 <div class="dashboard-container">
   <header class="dashboard-header">
     <h1 class="dashboard-title">🌐 Live Host Monitoring Dashboard</h1>
 
     <div class="stats-and-export">
+      <!-- Stats -->
       <div class="stats-summary">
         <div class="stat-box up">
           <span class="stat-value">{{ getUpHostsCount() }}</span>
@@ -18,61 +21,76 @@
         </div>
       </div>
 
-      <div class="export-button-wrapper">
-        <button class="export-button" (click)="exportToCSV()">
-          📤 Export Uptime Data
+      <!-- Actions -->
+      <div class="action-buttons">
+        <button class="primary-button blue" (click)="exportToCSV()">
+          📤 Export Report
+        </button>
+        <button class="primary-button green" (click)="scrollToHistory()">
+          📜 View History
         </button>
       </div>
     </div>
   </header>
 
+  <!-- Loading -->
   <div *ngIf="hostEntries.length === 0" class="loading">
     <div class="spinner"></div>
     <p>Connecting to WebSocket & waiting for data...</p>
   </div>
-<div class="threshold-settings">
-  <label for="thresholdSlider" title="Slide to increase or decrease the latency threshold">
-    Latency Threshold: {{ threshold }} ms
-  </label>
 
-  <input
-    type="range"
-    id="thresholdSlider"
-    [(ngModel)]="threshold"
-    min="1"
-    max="1000"
-    class="threshold-slider"
-    (input)="updateThreshold()"
-    title="Adjust to change latency threshold"
-  />
-</div>
+  <!-- Threshold Settings -->
+  <div class="threshold-settings">
+    <label for="thresholdSlider" title="Slide to increase or decrease the latency threshold">
+      Latency Threshold: {{ threshold }} ms
+    </label>
 
+    <input
+      type="range"
+      id="thresholdSlider"
+      [(ngModel)]="threshold"
+      min="1"
+      max="1000"
+      class="threshold-slider"
+      (input)="updateThreshold()"
+      title="Adjust to change latency threshold"
+    />
+  </div>
+
+  <!-- Main Content -->
 
   <div *ngIf="hostEntries.length > 0">
     <!-- Chart -->
+    <h2 class="chart-heading">Host Availability Summary</h2>
     <div class="chart-container">
-      <div style="display: block;">
-        <canvas baseChart
-                [data]="pieChartData"
-                [labels]="pieChartLabels"
-                type="pie"
-                [options]="pieChartOptions">
-        </canvas>
-      </div>
+      <canvas
+        baseChart
+        [data]="pieChartData"
+        [labels]="pieChartLabels"
+        type="pie"
+        [options]="pieChartOptions">
+      </canvas>
     </div>
 
-    <!-- Host Cards -->
-    <div class="card-grid">
-      <app-host-card
-        *ngFor="let host of hostEntries"
-        [host]="host[0]"
-        [data]="host[1]">
-      </app-host-card>
-    </div>
+   
+<!-- Host Cards Section -->
+<div class="cards-section">
+  <h2 class="cards-heading">Real-Time Host Status</h2>
+  <p class="cards-subheading">Live availability, latency, and uptime for all monitored hosts</p>
+
+  <div class="card-grid">
+    <app-host-card
+      *ngFor="let host of hostEntries; trackBy: trackByHost"
+      [host]="host[0]"
+      [data]="host[1]">
+    </app-host-card>
+  </div>
+</div>
+
 
     <!-- History Table -->
-    <div class="history-table">
-      <h2>Recent Status History</h2>
+    <div id="history-section" class="history-table">
+        <h2>Recent Status History</h2>
       <div [class.compact-mode]="isCompactMode" class="history-table-wrapper">
         <table>
           <thead>
@@ -85,7 +103,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let host of hostEntries">
+            <tr *ngFor="let host of hostEntries; trackBy: trackByHost">
               <td>{{ host[0] }}</td>
               <td>
                 <span class="status-badge" [ngClass]="{ up: host[1].up, down: !host[1].up }">
@@ -97,8 +115,9 @@
               <td>{{ host[1].lastChecked | date:'mediumTime' }}</td>
               <td>
                 <div class="uptime-bar">
-                  <div class="uptime-fill"
-                       [style.width.%]="(host[1].successCount / host[1].totalChecks) * 100">
+                  <div
+                    class="uptime-fill"
+                    [style.width.%]="(host[1].successCount / host[1].totalChecks) * 100">
                   </div>
                   <span>
                     {{ (host[1].successCount / host[1].totalChecks) * 100 | number:'1.1-1' }}%
@@ -108,7 +127,22 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- History actions -->
+        <div class="history-actions">
+          <button class="primary-button green" (click)="scrollToHistoryTop()">⬆️ Back to History Top</button>
+          <button class="primary-button blue" (click)="scrollToTop()">🏠 Back to Top</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Floating Back-to-Top FAB -->
+<button
+  class="scroll-top-fab"
+  *ngIf="showScrollTop"
+  (click)="scrollToTop()"
+  aria-label="Back to top">
+  ↑
+</button>

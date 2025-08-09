@@ -1,11 +1,8 @@
-[⬅ Back to Home](./) | [Next → Usage](usage.md)
+[⬅ Back to Home](./) | [Next → Usage](usage.md) | [To → Setup](setup.md)
 ---
 
 ## title: Architecture
 
-<div style="text-align: right;">
-  <a href="overview.md">⬅ Back to Overview</a> | <a href="setup.md">Next → Setup</a>
-</div>
 
 # Architecture
 
