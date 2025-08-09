@@ -1,17 +1,17 @@
-FROM golang:1.21-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install bash (for running scripts)
-RUN apk add --no-cache bash
+
+COPY package*.json ./
+RUN npm install -g @angular/cli && npm install
+
 
 COPY . .
 
-RUN go build -o host-monitor ./cmd/monitor
 
-# Expose backend port (for WebSocket)
-EXPOSE 8080
+ENV NG_CLI_ANALYTICS=ci
+ENV CHOKIDAR_USEPOLLING=true
 
-# Default to running the ping-many script
-RUN chmod +x ./scripts/ping-many.sh
-CMD ["./scripts/ping-many.sh"]
+EXPOSE 4200
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000", "--proxy-config", "proxy.conf.json"]
