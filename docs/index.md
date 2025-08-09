@@ -10,4 +10,5 @@ title: Host Monitor Documentation
 ![Docker](https://img.shields.io/badge/Docker-ready-blue)
 
 ## 📂 Documentation
-[Overview](overview.md) · [Architecture](architecture.md) · [Setup](setup.md) · [Usage](usage.md) · [Maintenance](maintenance.md)
+[Overview](overview.md) · [Architecture](architecture.md) · [Setup](setup.md) · [Usage](usage.md) · [Maintenance](maintenance.md) · [Technology Choices](tech.md)
+
