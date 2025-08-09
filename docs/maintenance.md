@@ -43,3 +43,4 @@ make ui-build     # builds Angular UI
 
 # validate settings.json syntax
 jq . config/settings.json >/dev/null
+<p align="center"> <a href="index.md"> <img src="https://img.shields.io/badge/⬅️%20Back%20to%20Home-000?style=for-the-badge" alt="Back to Home"> </a> </p> ```
