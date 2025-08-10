@@ -28,7 +28,7 @@ At a glance, review host status cards, uptime distribution charts, and latency t
 ![Real-time host status grid](images/hosts_status.png)
 
 ## Export Data
-Download historical uptime and latency metrics for reporting or analysis via the **Export to CSV** button.
+Download historical uptime and latency metrics for reporting or analysis via the **Export Report** button.
 
 ## Copy Details Quickly
 Click the copy-to-clipboard button on any host card to instantly copy its connection details.
