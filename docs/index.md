@@ -21,6 +21,7 @@ title: Host Monitor Documentation
 4. [Usage](usage.md) – How to use the dashboard, configure hosts, and export data.
 5. [Maintenance](maintenance.md) – Routine tasks, service management, and troubleshooting.
 6. [Technology Choices](tech.md) – Rationale behind Go, Angular, WebSockets, and Docker.
+7. [Future Improvements](future_improvements.md) – Planned enhancements for AI, integrations, and scalability.
 
 ---
 
