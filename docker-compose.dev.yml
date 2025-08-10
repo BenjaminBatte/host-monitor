@@ -1,23 +1,59 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  postgres:
+    image: postgres:16
+    container_name: host-monitor-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-2020}
+      POSTGRES_DB: ${DB_NAME:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   backend:
     build:
       context: ./backend
+    environment:
+      # Prefer a single DSN; backend should read DB_URL
+      DB_URL: ${DB_URL:-postgres://${DB_USER:-postgres}:${DB_PASS:-2020}@postgres:5432/${DB_NAME:-postgres}?sslmode=disable}
+      # expose anything else your server needs (ports, ws, etc.)
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: always
+    # Optional: simple healthcheck if you expose /health
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
 
   ui:
     build:
       context: ./ui
+    environment:
+      # Let the UI hit backend via Docker network name
+      API_BASE_URL: ${API_BASE_URL:-http://backend:8080}
     ports:
       - "4200:4200"
     volumes:
       - ./ui:/app
     working_dir: /app
-    restart: always
     depends_on:
       - backend
+    restart: always
+
+volumes:
+  pgdata:

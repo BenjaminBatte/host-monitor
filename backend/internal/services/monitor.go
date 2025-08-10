@@ -11,14 +11,20 @@ import (
 type MonitorService struct {
 	hosts   []string
 	metrics *MetricsStore
+
+	events chan CheckEvent // 👈 add this
 }
 
 func NewMonitorService(hosts []string) *MonitorService {
 	return &MonitorService{
 		hosts:   hosts,
 		metrics: NewMetricsStore(),
+		events:  make(chan CheckEvent, 1024), // 👈 buffered so we never block checks
 	}
 }
+
+// Read-only channel for consumers (DB writer, alerting, etc.)
+func (m *MonitorService) Events() <-chan CheckEvent { return m.events } // 👈 add this
 
 func (m *MonitorService) CheckHost(host string, port int) (string, time.Duration, error) {
 	address := fmt.Sprintf("[%s]:%d", host, port)
@@ -38,9 +44,9 @@ func (m *MonitorService) Start(port int, interval time.Duration) {
 	for _, host := range m.hosts {
 		go m.monitorHost(host, port, interval)
 	}
-
 	select {} // block forever
 }
+
 func (m *MonitorService) monitorHost(h string, port int, interval time.Duration) {
 	for {
 		address := fmt.Sprintf("[%s]:%d", h, port)
@@ -49,16 +55,37 @@ func (m *MonitorService) monitorHost(h string, port int, interval time.Duration)
 		duration := time.Since(start)
 		threshold := config.GetThreshold()
 
-		if err != nil || duration.Milliseconds() > int64(threshold) {
+		up := (err == nil) && (duration.Milliseconds() <= int64(threshold))
+
+		if up {
+			fmt.Printf("[%s] UP (latency: %v ms, threshold: %d ms)\n", h, duration.Milliseconds(), threshold)
+			m.metrics.Update(h, duration, true)
+			conn.Close()
+		} else {
 			fmt.Printf("[%s] DOWN (latency: %v ms, threshold: %d ms, err: %v)\n", h, duration.Milliseconds(), threshold, err)
 			m.metrics.Update(h, 0, false)
 			if err == nil {
 				conn.Close()
 			}
-		} else {
-			fmt.Printf("[%s] UP (latency: %v ms, threshold: %d ms)\n", h, duration.Milliseconds(), threshold)
-			m.metrics.Update(h, duration, true)
-			conn.Close()
+		}
+
+		// 👇 emit event (packet loss unknown for TCP check -> 0)
+		ev := CheckEvent{
+			Host: h,
+			Up:   up,
+			LatencyMs: func() int {
+				if up {
+					return int(duration.Milliseconds())
+				}
+				return -1
+			}(),
+			PacketLoss: 0,
+			CheckedAt:  time.Now().UTC(),
+		}
+		select {
+		case m.events <- ev:
+		default:
+			// channel full; drop to avoid blocking the probe loop
 		}
 
 		time.Sleep(interval)

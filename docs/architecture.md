@@ -4,31 +4,36 @@ title: Architecture
 
 [⬅ Back to Home](./) | [Next → Usage](usage.md) | [→ Setup](setup.md)
 
-# Architecture
+---
 
-## Backend
-The backend is a high-performance **Go** service designed for real-time network monitoring:
+# Usage
 
-- **Concurrent host checks:** Uses goroutines to ping multiple hosts at a configurable interval.
-- **Metric aggregation:** Tracks latency, uptime percentage, and packet loss.
-- **Real-time updates:** Pushes data instantly to all connected clients via WebSockets — no polling required.
-- **Dynamic configuration:** Supports live updates to hosts and latency threshold without restarting the service.
+Once the Host Monitor service is running:
 
-## Frontend
-The **Angular**-based dashboard is optimized for clarity, speed, and responsiveness:
+- **Access the Dashboard:**  
+  Open the web dashboard in your browser (e.g., `http://localhost:4200` for dev or your deployed URL).  
 
-- **Live status cards:** Show latency, uptime, and packet loss for each monitored host.
-- **Interactive charts:** Visualize uptime distribution and latency trends.
-- **Settings panel:** Add/remove hosts and adjust latency threshold in real time.
-- **Data export & sharing:** CSV download for historical data and one-click copy-to-clipboard for host details.
-- **WebSocket integration:** Subscribes to backend streams for seamless live updates.
+- **Real-Time Monitoring:**  
+  The UI connects to the backend via **WebSockets**, receiving live updates for each monitored host — no page refresh required.  
 
-## Deployment
-Flexible deployment options allow the system to run in multiple environments:
+- **Historical Data Storage:**  
+  Every host check (status, latency, packet loss, timestamp) is **persisted in PostgreSQL** by the backend.  
+  This enables future analysis, reporting, and offline queries even if the UI wasn’t connected at the time.  
 
-- **Docker** – Portable, reproducible builds for any platform.
-- **systemd** – Persistent, auto-starting services on Linux.
-- **Kubernetes** – Manifests for cloud-native scaling and orchestration.
-- **Static hosting** – Serve the Angular UI via Nginx or any static file server.
+- **Configure Hosts & Thresholds:**  
+  Use the **Slide Panel** to  adjust the latency threshold.  
+  Changes are applied instantly without restarting the backend.  
 
-[⬅ Back to Home](./) | [Next → Usage](usage.md)
+- **Visual Insights:**  
+  Review host status cards, uptime pie charts, and latency trend charts in real time.  
+
+- **Export Data:**  
+  Use the **Export to CSV** button to download historical uptime and latency data from the live session.  
+  For older data, you can query PostgreSQL directly.  
+
+- **Copy Details Quickly:**  
+  Click the copy-to-clipboard button on any host card to grab connection details instantly.  
+
+---
+
+[⬅ Back to Setup](setup.md) | [Next → Maintenance](maintenance.md)
