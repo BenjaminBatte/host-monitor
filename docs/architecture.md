@@ -1,38 +1,71 @@
 ---
-title: Architecture
+
+## title: Architecture
+
 ---
 
 [⬅ Back to Home](./) | [Next → Usage](usage.md) | [→ Setup](setup.md)
 
 ---
 
-# Usage
+# System Architecture
 
-Once the Host Monitor service is running:
+This page describes how Host Monitor is structured, how data flows through the system, and the key runtime behaviors.
 
-- **Access the Dashboard:**  
-  Open the web dashboard in your browser (e.g., `http://localhost:4200` for dev or your deployed URL).  
+## High‑Level Components
 
-- **Real-Time Monitoring:**  
-  The UI connects to the backend via **WebSockets**, receiving live updates for each monitored host — no page refresh required.  
+![Class Diagram — Key Components & Data](./diagrams/class-diagram-key-components-data.svg)
 
-- **Historical Data Storage:**  
-  Every host check (status, latency, packet loss, timestamp) is **persisted in PostgreSQL** by the backend.  
-  This enables future analysis, reporting, and offline queries even if the UI wasn’t connected at the time.  
+**What’s shown:** Angular UI, WebSocket server, Go services (`MonitorService`, `MetricsStore`), persistence (PostgreSQL), and core data models.
 
-- **Configure Hosts & Thresholds:**  
-  Use the **Slide Panel** to  adjust the latency threshold.  
-  Changes are applied instantly without restarting the backend.  
+## Detailed Domain & Services
 
-- **Visual Insights:**  
-  Review host status cards, uptime pie charts, and latency trend charts in real time.  
+![Class Diagram — Domain & Services (Detailed)](./diagrams/class-diagram-domain-services-detailed.svg)
 
-- **Export Data:**  
-  Use the **Export to CSV** button to download historical uptime and latency data from the live session.  
-  For older data, you can query PostgreSQL directly.  
+**What’s shown:** Method‑level view of domain models (`HostMetrics`, DTO), services (`MonitorService`, `MetricsStore`), settings/threshold API, and relationships.
 
-- **Copy Details Quickly:**  
-  Click the copy-to-clipboard button on any host card to grab connection details instantly.  
+## Runtime Flows
+
+### Real‑Time Host Monitoring (Host 1 … Host N)
+
+![Sequence Diagram — Real‑Time Host Monitoring – Host](./diagrams/sequence-diagram-real-time-host-monitoring-host.svg)
+
+**Flow:** Browser → Angular Dashboard → WebSocket → Backend → Pingers → DB → WebSocket → UI.
+
+### Metrics Push Loop
+
+![Sequence Diagram — Real‑Time Metrics Push](./diagrams/sequence-diagram-real-time-metrics-push.svg)
+
+**Flow:** Pingers report → `MetricsService` aggregates → DB upsert → broadcast JSON over `/ws` → UI renders.
+
+### Update Latency Threshold
+
+![Sequence Diagram — Update Latency Threshold](./diagrams/sequence-diagram-update-latency-threshold.svg)
+
+**Flow:** UI slider (debounced) → send `{ setThreshold }` over `/ws` → backend acks and applies → UI toast.
+
+## Connection Behavior
+
+### WebSocket Reconnect & Backoff
+
+![Flowchart — WebSocket Reconnect & Backoff](./diagrams/flowchart-websocket-reconnect-backoff.svg)
+
+**Strategy:** Exponential backoff (1s, 2s, 4s … max 30s). On reconnect, UI resubscribes and resumes live updates.
+
+### Host Status State Machine
+
+![State Diagram — Host Status](./diagrams/state-diagram-host-status.svg)
+
+**Rules:**
+
+* First success → **Up**
+* Fail or latency > threshold → **Down**
+* Success with latency ≤ threshold → **Up**
+
+## Notes on Persistence
+
+* Each check is written to `public.checks (host, up, latency_ms, packet_loss, checked_at)`.
+* DB connectivity is optional for local/dev; when configured, events are persisted asynchronously.
 
 ---
 

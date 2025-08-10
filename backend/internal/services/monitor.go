@@ -79,7 +79,7 @@ func (m *MonitorService) monitorHost(h string, port int, interval time.Duration)
 				}
 				return -1
 			}(),
-			PacketLoss: 0,
+			PacketLoss: 0, // retun 0 for now as we are not checking packet loss in TCP. do research for future checks
 			CheckedAt:  time.Now().UTC(),
 		}
 		select {

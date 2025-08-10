@@ -1,125 +1,114 @@
-<<<<<<< HEAD
-# Host Monitor
+# Host Monitor – Backend
 
-A real-time network monitoring tool built in **Go**, designed to track host availability, latency, uptime, and packet loss — with live updates via **WebSocket** to a dynamic **Angular** frontend.
+## Project Information
 
----
+Full documentation:
+[https://benjaminbatte.github.io/host-monitor/](https://benjaminbatte.github.io/host-monitor/)
 
-## Features
+## ⚡ Quick Start
 
- Monitor multiple hosts simultaneously
-Track latency, uptime percentage, and packet loss
-WebSocket server for real-time metrics streaming
-Angular UI with live charts and status dashboard
-Systemd service support
-Docker-compatible for portable deployment
-Built in **Go** 
-
----
-
-## CLI Usage
-
-Run the backend with:
+**Option 1 – Run directly**
 
 ```bash
 go run ./cmd/monitor \
   --hosts=8.8.8.8,1.1.1.1 \
   --port=80 \
   --interval=5s
---hosts: Comma-separated list of IPs or hostnames
+```
 
---port: TCP port to check for reachability
+**Option 2 – Use helper script**
 
---interval: Frequency of pinging hosts (e.g., 5s, 10s)
+```bash
+chmod +x scripts/ping-many.sh
+./scripts/ping-many.sh
+```
 
-🌐 WebSocket API
-Endpoint: ws://localhost:8080/ws
+**Flags:**
 
-Pushes JSON data every second with host metrics
+* `--hosts` — Comma-separated list of IPs or hostnames
+* `--port` — TCP port to check for reachability
+* `--interval` — Frequency of checks (e.g., 5s, 10s)
 
-See docs/api.md for full schema
+**WebSocket endpoint:**
 
- Example Output (UI)
-json
+```
+ws://localhost:8080/ws
+```
 
-{
-  "8.8.8.8": {
-    "up": true,
-    "latency": 22,
-    "uptime": 99.9,
-    "packetLoss": 0
-  }
-}
+---
 
-Project Structure
-bash
-Copy
-Edit
-host-monitor/
-├── cmd/monitor/         # CLI entrypoint
-├── internal/            # Core logic (models, services)
-├── pkg/ping/            # ICMP ping
-├── pkg/websocket/       # WebSocket broadcasting
-├── ui/                  # Angular dashboard
-├── docs/                # Documentation
-├── deployments/         # Docker + Kubernetes configs
-├── Makefile             # Build/test commands
-├── Dockerfile
-├── host-monitor.service # systemd unit file
-└── README.md
+## 🐳 Docker (no Go toolchain required)
 
-Docker (Linux Only)
-docker build -t host-monitor .
-docker run --rm --network=host host-monitor \
+**Build**
+
+```bash
+docker build -t host-monitor-backend .
+```
+
+**Run (host network)**
+
+```bash
+docker run --rm \
+  --network=host \
+  -e DB_URL="postgres://postgres:2020@localhost:5432/postgres?sslmode=disable" \
+  host-monitor-backend \
   --hosts=8.8.8.8,1.1.1.1 \
   --port=80 \
   --interval=5s
-See docs/docker.md
+```
 
-Systemd Service (Linux)
-Install the binary and .service file, then:
-sudo systemctl daemon-reexec
+> If you’re on macOS/Windows with Docker Desktop, replace `localhost` in `DB_URL` with `host.docker.internal`.
+
+**Run (mapped ports)**
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e DB_URL="postgres://postgres:2020@host.docker.internal:5432/postgres?sslmode=disable" \
+  host-monitor-backend \
+  --hosts=8.8.8.8,1.1.1.1 \
+  --port=80 \
+  --interval=5s
+```
+
+---
+
+## ⚙️ Systemd (Linux service)
+
+**Unit file** (`/etc/systemd/system/host-monitor.service`):
+
+```ini
+[Unit]
+Description=Host Monitor Backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=DB_URL=postgres://postgres:2020@localhost:5432/postgres?sslmode=disable
+WorkingDirectory=/opt/host-monitor/backend
+ExecStart=/usr/local/bin/host-monitor \
+  --hosts=8.8.8.8,1.1.1.1 \
+  --port=80 \
+  --interval=5s
+Restart=always
+RestartSec=3
+User=hostmon
+Group=hostmon
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Install & start**
+
+```bash
+sudo cp host-monitor /usr/local/bin/
+sudo useradd -r -s /usr/sbin/nologin hostmon || true
+sudo mkdir -p /opt/host-monitor/backend
+sudo chown -R hostmon:hostmon /opt/host-monitor
+sudo systemctl daemon-reload
 sudo systemctl enable host-monitor
 sudo systemctl start host-monitor
-See docs/system.md
-=======
+sudo systemctl status host-monitor --no-pager
+```
 
-
-Frontend UI
-
-The Angular-based dashboard connects to the backend WebSocket server and visualizes host metrics in real time.
-
-To run the frontend:
-
-```bash
-cd ui/
-ng serve
-Then open http://localhost:4200/ in your browser.
-
-The UI expects the WebSocket server to be available at:
-ws://localhost:8080/
-Use ng build to compile for production.
-
-Documentation
-WebSocket API
-
-Architecture Overview
-
-Docker Guide
-
-Systemd Setup
->>>>>>> 81b8f9f (Backend)
-
-
-
-## ⚡ Quick Start (Manual)
-
-1. Make the helper script executable:
-```bash
-chmod +x scripts/ping-many.sh
-
-Optionally run the script (example usage):
-./scripts/ping-many.sh
-
-Or run the monitor directly with flags:
-./host-monitor --hosts=1.1.1.1,8.8.8.8 --port=80 --interval=5s
