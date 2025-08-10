@@ -36,9 +36,9 @@ Click the copy-to-clipboard button on any host card to instantly copy its connec
 ---
 
 ## Recent Status History
-See the latest checks with timestamps, status, latency, and uptime percentage — all in an easy-to-scan table.
+Click the copy-to-clipboard button on any host card to instantly copy its connection details.
 
-![Recent status history table](images/history.png)
+![Copy to clipboard on host card](images/copy_to_clipboad.png)
 
 ---
 

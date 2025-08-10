@@ -1,16 +1,49 @@
 package models
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 )
 
-type HostStatus string
+type HostStatus int
 
 const (
-	StatusUp   HostStatus = "UP"
-	StatusDown HostStatus = "DOWN"
+	StatusUp HostStatus = iota
+	StatusDown
 )
+
+func (s HostStatus) String() string {
+	switch s {
+	case StatusUp:
+		return "UP"
+	case StatusDown:
+		return "DOWN"
+	default:
+		return "UNKNOWN"
+	}
+}
+
+func (s HostStatus) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
+}
+
+func (s *HostStatus) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	switch str {
+	case "UP":
+		*s = StatusUp
+	case "DOWN":
+		*s = StatusDown
+	default:
+		return fmt.Errorf("invalid HostStatus: %s", str)
+	}
+	return nil
+}
 
 type HostMetrics struct {
 	Host           string
