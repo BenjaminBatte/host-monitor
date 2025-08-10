@@ -26,7 +26,7 @@ sudo apt install -y git golang-go postgresql postgresql-client ufw
 ## 2. Clone & Build
 
 ```bash
-git clone https://github.com/<you>/host-monitor.git
+git clone https://github.com/BenjaminBatte/host-monitor.git
 cd host-monitor
 # Build backend binary
 go build -o host-monitor ./backend/cmd/monitor
