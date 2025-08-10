@@ -14,7 +14,7 @@ Open the web dashboard in your browser (e.g., `http://localhost:4200` for develo
 ![Dashboard overview](images/dashboard.png)
 
 ## Real-Time Monitoring
-View live host statuses with latency, packet loss, and uptime updated instantly via WebSockets — no manual refresh required.
+View live host statuses with latency and uptime updated instantly via WebSockets — no manual refresh required.
 
 ## Configure Hosts & Thresholds
 Use the **Settings Panel** to:
@@ -33,12 +33,14 @@ Download historical uptime and latency metrics for reporting or analysis via the
 ## Copy Details Quickly
 Click the copy-to-clipboard button on any host card to instantly copy its connection details.
 
+![Copy to clipboard on host card](images/copy_to_clipboad.png)
+
 ---
 
 ## Recent Status History
-Click the copy-to-clipboard button on any host card to instantly copy its connection details.
+See the latest checks with timestamps, status, latency, and uptime percentage — all in an easy-to-scan table.
 
-![Copy to clipboard on host card](images/copy_to_clipboad.png)
+![Recent status history table](images/history.png)
 
 ---
 
