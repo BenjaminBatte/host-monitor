@@ -7,22 +7,13 @@ After=network-online.target
 Type=simple
 User=hostmonitor
 Group=hostmonitor
-# Optional: load env from file (create it if you need DB_URL, etc.)
-# EnvironmentFile=/etc/host-monitor/host-monitor.env
 Environment=GO_ENV=production
-
-
-ExecStart=/usr/local/bin/host-monitor --hosts=1.1.1.1,8.8.8.8 --port=80 --interval=5s
-WorkingDirectory=/usr/local/bin
-
+WorkingDirectory=/etc/host-monitor
+ExecStart=/etc/host-monitor/scripts/ping-many.sh
 Restart=always
 RestartSec=5
-
-# Journald logging
 StandardOutput=journal
 StandardError=journal
-
-
 NoNewPrivileges=true
 ProtectSystem=full
 ProtectHome=true
