@@ -1,131 +1,103 @@
 ---
-
 ## title: Setup
-
 ---
 
 [⬅ Back to Home](./) | [Next → Usage](usage.md)
 
 # Setup
 
-## 1. Prerequisites
+## 1) Prerequisites
 
 * Ubuntu/Debian/CentOS with **systemd**
-* **Go 1.22+** (to build) or prebuilt binary
-* **PostgreSQL** (optional, for persistence)
-* **Docker** (optional, for containerized deployment)
-
-> Fresh Ubuntu/Debian packages:
+* **Go 1.22+** (to build) or use a prebuilt binary
 
 ```bash
 sudo apt update
-sudo apt install -y git golang-go 
-
+sudo apt install -y git golang-go
 ```
 
 ---
 
-## 2. Clone & Build (Makefile recommended)
+## 2) Clone
 
 ```bash
 git clone https://github.com/BenjaminBatte/host-monitor.git
-cd host-monitor
-cd backend
-make build   # builds ./host-monitor from ./backend/cmd/monitor
+cd host-monitor/backend
 ```
 
 ---
 
-## 3. Install Binary & Create Service User
+## 3) One-command install (recommended)
 
-Create the service user (needed because the unit runs as `hostmonitor`):
+This builds the Go binary, copies the bundled UI to `/etc/host-monitor/web/`, installs the systemd unit, reloads systemd, and starts the service.
 
 ```bash
-sudo useradd --system --no-create-home --shell /usr/sbin/nologin hostmonitor
+make deploy
 ```
 
-Install the binary (Makefile):
+> After this, the dashboard is available at:
 
-```bash
-make install  # copies to /usr/local/bin/host-monitor
 ```
-
----
-
-## 4. Install the systemd Unit
-
-Using the Makefile:
-
-```bash
-make install-service  # installs unit, daemon-reload, enables & starts
+http://<server-ip>:9090
 ```
 
 ---
 
-## 5. Configure Hosts/Flags via Drop-in (Recommended)
-
-Instead of editing the unit file directly:
+## 4) Manual install (if you prefer separate steps)
 
 ```bash
-sudo systemctl edit host-monitor
+# Build and install binary
+make build
+sudo install -m 0755 host-monitor /usr/local/bin/host-monitor
+
+# Copy bundled Angular UI to the path the unit expects
+sudo mkdir -p /etc/host-monitor/web
+sudo cp -R web/* /etc/host-monitor/web/
+
+# Install + enable + start the systemd unit
+make install-service
 ```
 
 ---
 
-## 6. Start & Enable Service
-
-If you used `make install-service`, the service is already enabled and started.
-
-**Otherwise:**
+## 5) Verify & Logs
 
 ```bash
-sudo systemctl enable --now host-monitor
-```
-
----
-
-## 7. Verify & View Logs
-
-```bash
-make status
-# or
 systemctl status host-monitor
 journalctl -u host-monitor -e -f
 ```
 
----
+Open the dashboard:
 
+```
+http://<server-ip>:9090
+```
 
-
-## 8. UI (Dashboard) Options
-
-This setup runs the **backend** service. To run the **Angular UI** on the same machine:
-
-* **Dev**
-
-  ```bash
-  cd ui
-  npm ci
-  npm run start
-  # Configure the UI to point to ws://<server-ip>:9090
-  ```
-
-* **Prod (serve built UI)**
-
-  * Build: `npm run build`
-  * Serve via Nginx/Apache or any static server (or use Docker compose in this repo).
+* UI is served from the backend
+* WebSocket endpoint is available at `/ws`
 
 ---
 
-## 13. Updating
-
-**Makefile:**
+## 6) Update to latest
 
 ```bash
+cd host-monitor/backend
 make build
-make install
+sudo cp host-monitor /usr/local/bin/host-monitor
 sudo systemctl restart host-monitor
 ```
+
+---
+
+## Optional: Database
+
+No database is required. To persist checks to PostgreSQL, set `DB_URL` in:
+
+```
+/etc/host-monitor/host-monitor.env
+```
+
+and restart the service.
 
 ---
 

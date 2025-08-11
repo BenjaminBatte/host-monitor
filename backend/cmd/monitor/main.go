@@ -83,7 +83,7 @@ func startConfigReloader() {
 
 // Run initializes and starts the monitor and WebSocket server
 func Run(ctx context.Context, cfg *Config) {
-	// Load .env in dev (optional; harmless in prod)
+
 	_ = godotenv.Load()
 
 	// Create DB if DB_URL/DB_HOST present (enables “run without DB” too)
@@ -104,8 +104,23 @@ func Run(ctx context.Context, cfg *Config) {
 	server := ws.NewWebSocketServer(monitor.GetMetricsStore())
 
 	mux := http.NewServeMux()
+
+	// WS + API
 	mux.HandleFunc("/ws", server.HandleConnections)
 	mux.HandleFunc("/api/threshold", threshold.ThresholdHandler)
+
+	// Serve Angular dist from backend/web with SPA fallback
+	webDir := "web"
+	fs := http.FileServer(http.Dir(webDir))
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p := webDir + r.URL.Path
+		if info, err := os.Stat(p); err == nil && !info.IsDir() {
+			fs.ServeHTTP(w, r)
+			return
+		}
+		http.ServeFile(w, r, webDir+"/index.html")
+	}))
+
 	httpServer := &http.Server{Addr: "0.0.0.0" + cfg.WSPort, Handler: mux}
 
 	// WebSocket broadcaster
