@@ -1,16 +1,10 @@
-
-version: "3.8"
 services:
   backend:
-    build:
-      context: ..
-      dockerfile: Dockerfile
+    image: benjaminbatte/host-monitor-backend:2025-08-11
     ports:
       - "9090:9090"
 
   ui:
-    build:
-      context: ../ui
-      dockerfile: Dockerfile
+    image: benjaminbatte/host-monitor-ui:2025-08-11
     ports:
-      - "4200:80"
+      - "4200:80"  

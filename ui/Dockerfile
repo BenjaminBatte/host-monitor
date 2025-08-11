@@ -1,11 +1,11 @@
-FROM node:20-alpine
-
+# ui/Dockerfile
+FROM node:20-alpine AS build
 WORKDIR /app
-
+COPY package*.json ./
+RUN npm ci
 COPY . .
+RUN npm run build -- --configuration production
 
-RUN npm install -g @angular/cli && npm install
-
-EXPOSE 4200
-
-CMD ["npm", "start"]
+FROM nginx:alpine
+COPY --from=build /app/dist/ /usr/share/nginx/html
+EXPOSE 80
