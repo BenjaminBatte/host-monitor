@@ -7,13 +7,20 @@ After=network-online.target
 Type=simple
 User=hostmonitor
 Group=hostmonitor
-Environment=GO_ENV=production
-WorkingDirectory=/etc/host-monitor
-ExecStart=/etc/host-monitor/scripts/ping-many.sh
+
+EnvironmentFile=-/etc/host-monitor/host-monitor.env
+
+ExecStart=/usr/local/bin/host-monitor \
+  --hosts=${HOSTS} \
+  --port=${PORT} \
+  --interval=${INTERVAL} \
+  --ws-port=${WSPORT}
+
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
+
 NoNewPrivileges=true
 ProtectSystem=full
 ProtectHome=true
