@@ -3,19 +3,18 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { Observable, timer } from 'rxjs';
 import { retryWhen, delayWhen, tap, shareReplay } from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class MetricsService {
   private socket$: WebSocketSubject<any> | null = null;
-  private readonly WS_URL = 'ws://localhost:9090/ws'; 
+
+  // Build WS URL from the current page's origin
+  private readonly WS_URL =
+    `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
 
   private connect(): WebSocketSubject<any> {
     return webSocket({
       url: this.WS_URL,
-      openObserver: {
-        next: () => console.log('[WebSocket] connected'),
-      },
+      openObserver: { next: () => console.log('[WebSocket] connected') },
       closeObserver: {
         next: () => {
           console.log('[WebSocket] disconnected');
@@ -26,10 +25,7 @@ export class MetricsService {
   }
 
   getMetrics(): Observable<any> {
-    if (!this.socket$) {
-      this.socket$ = this.connect();
-    }
-
+    if (!this.socket$) this.socket$ = this.connect();
     return this.socket$.pipe(
       retryWhen(errors =>
         errors.pipe(
