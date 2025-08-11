@@ -44,7 +44,7 @@ docker restart host-monitor
 # pull latest image & restart (Docker)
 docker pull <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/host-monitor:latest
 docker stop host-monitor && docker rm host-monitor
-docker run -d --name host-monitor -p 80:8080 <...> # with your flags
+docker run -d --name host-monitor -p 80:9090 <...> # with your flags
 
 # or rebuild locally
 make build        # builds backend

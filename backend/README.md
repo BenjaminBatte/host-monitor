@@ -32,7 +32,7 @@ chmod +x scripts/ping-many.sh
 **WebSocket endpoint:**
 
 ```
-ws://localhost:8080/ws
+ws://localhost:9090/ws
 ```
 
 ---
@@ -62,7 +62,7 @@ docker run --rm \
 **Run (mapped ports)**
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 9090:9090 \
   -e DB_URL="postgres://postgres:2020@host.docker.internal:5432/postgres?sslmode=disable" \
   host-monitor-backend \
   --hosts=8.8.8.8,1.1.1.1 \

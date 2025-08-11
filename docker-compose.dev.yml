@@ -26,7 +26,7 @@ services:
       DB_URL: ${DB_URL:-postgres://${DB_USER:-postgres}:${DB_PASS:-2020}@postgres:5432/${DB_NAME:-postgres}?sslmode=disable}
       # expose anything else your server needs (ports, ws, etc.)
     ports:
-      - "8080:8080"
+      - "9090:9090"
     volumes:
       - ./backend:/app
     depends_on:
@@ -35,7 +35,7 @@ services:
     restart: always
     # Optional: simple healthcheck if you expose /health
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9090/health || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 6
@@ -45,7 +45,7 @@ services:
       context: ./ui
     environment:
       # Let the UI hit backend via Docker network name
-      API_BASE_URL: ${API_BASE_URL:-http://backend:8080}
+      API_BASE_URL: ${API_BASE_URL:-http://backend:9090}
     ports:
       - "4200:4200"
     volumes:

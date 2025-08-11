@@ -1,5 +1,7 @@
 ---
+
 ## title: Setup
+
 ---
 
 [⬅ Back to Home](./) | [Next → Usage](usage.md)
@@ -23,11 +25,17 @@ sudo apt install -y git golang-go postgresql postgresql-client ufw
 
 ---
 
-## 2. Clone & Build
+## 2. Clone & Build (Makefile recommended)
 
 ```bash
 git clone https://github.com/BenjaminBatte/host-monitor.git
 cd host-monitor
+make build   # builds ./host-monitor from ./backend/cmd/monitor
+```
+
+**Alternative (manual):**
+
+```bash
 # Build backend binary
 go build -o host-monitor ./backend/cmd/monitor
 ```
@@ -36,8 +44,21 @@ go build -o host-monitor ./backend/cmd/monitor
 
 ## 3. Install Binary & Create Service User
 
+Create the service user (needed because the unit runs as `hostmonitor`):
+
 ```bash
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin hostmonitor
+```
+
+Install the binary (Makefile):
+
+```bash
+make install  # copies to /usr/local/bin/host-monitor
+```
+
+**Alternative (manual):**
+
+```bash
 sudo install -m 0755 host-monitor /usr/local/bin/host-monitor
 ```
 
@@ -83,9 +104,18 @@ sudo chown root:root /etc/host-monitor/host-monitor.env
 
 ## 6. Install the systemd Unit
 
+Using the Makefile:
+
+```bash
+make install-service  # installs unit, daemon-reload, enables & starts
+```
+
+**Alternative (manual):**
+
 ```bash
 sudo cp backend/deployments/host-monitor.service /etc/systemd/system/host-monitor.service
 sudo systemctl daemon-reload
+sudo systemctl enable --now host-monitor
 ```
 
 The provided unit:
@@ -128,6 +158,10 @@ sudo systemctl restart host-monitor
 
 ## 8. Start & Enable Service
 
+If you used `make install-service`, the service is already enabled and started.
+
+**Otherwise:**
+
 ```bash
 sudo systemctl enable --now host-monitor
 ```
@@ -137,6 +171,8 @@ sudo systemctl enable --now host-monitor
 ## 9. Verify & View Logs
 
 ```bash
+make status
+# or
 systemctl status host-monitor
 journalctl -u host-monitor -e -f
 ```
@@ -151,10 +187,10 @@ If WebSocket/API listens on `:9090` (as in the drop-in above):
 sudo ufw allow 9090/tcp
 ```
 
-If your API listens on another port (e.g., `:8080`), allow that instead:
+If your API listens on another port (e.g., `:8180`), allow that instead:
 
 ```bash
-sudo ufw allow 8080/tcp
+sudo ufw allow 9090/tcp
 ```
 
 ---
@@ -199,6 +235,16 @@ This setup runs the **backend** service. To run the **Angular UI** on the same m
 ---
 
 ## 13. Updating
+
+**Makefile:**
+
+```bash
+make build
+make install
+sudo systemctl restart host-monitor
+```
+
+**Alternative (manual):**
 
 ```bash
 # From repo root

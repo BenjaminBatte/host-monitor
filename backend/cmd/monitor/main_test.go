@@ -41,7 +41,7 @@ func TestParseFlags(t *testing.T) {
 	hosts := fs.String("hosts", "", "Comma-separated list of hosts to monitor")
 	port := fs.Int("port", 80, "Port to connect to")
 	interval := fs.Duration("interval", 5*time.Second, "Interval between checks")
-	wsPort := fs.String("ws-port", ":8080", "WebSocket server port")
+	wsPort := fs.String("ws-port", ":9090", "WebSocket server port")
 
 	if err := fs.Parse(args); err != nil {
 		t.Fatalf("Failed to parse flags: %v", err)

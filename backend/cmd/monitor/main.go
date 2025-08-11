@@ -30,7 +30,7 @@ func parseFlags() *Config {
 	hosts := flag.String("hosts", "", "Comma-separated list of hosts to monitor")
 	port := flag.Int("port", 80, "Port to connect to (simulates ping)")
 	interval := flag.Duration("interval", 5*time.Second, "Interval between checks")
-	wsPort := flag.String("ws-port", ":8080", "WebSocket server port")
+	wsPort := flag.String("ws-port", ":9090", "WebSocket server port")
 	flag.Parse()
 
 	if *hosts == "" {
