@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/BenjaminBatte/host-monitor/internal/config"
-	threshold "github.com/BenjaminBatte/host-monitor/internal/handlers"
+	handlers "github.com/BenjaminBatte/host-monitor/internal/handlers"
 	"github.com/BenjaminBatte/host-monitor/internal/services"
 	"github.com/BenjaminBatte/host-monitor/internal/storage"
 	ws "github.com/BenjaminBatte/host-monitor/pkg/websocket"
@@ -25,12 +25,11 @@ type Config struct {
 	WSPort   string
 }
 
-// parseFlags parses command-line arguments and returns a Config object
 func parseFlags() *Config {
 	hosts := flag.String("hosts", "", "Comma-separated list of hosts to monitor")
 	port := flag.Int("port", 80, "Port to connect to (simulates ping)")
 	interval := flag.Duration("interval", 5*time.Second, "Interval between checks")
-	wsPort := flag.String("ws-port", ":9090", "WebSocket server port")
+	wsPort := flag.String("ws-port", ":9090", "HTTP/WebSocket server port (e.g., :9090)")
 	flag.Parse()
 
 	if *hosts == "" {
@@ -45,6 +44,7 @@ func parseFlags() *Config {
 		WSPort:   *wsPort,
 	}
 }
+
 func persistLoop(ctx context.Context, monitor *services.MonitorService, db *storage.DB) {
 	events := monitor.Events()
 	for {
@@ -64,13 +64,12 @@ func persistLoop(ctx context.Context, monitor *services.MonitorService, db *stor
 	}
 }
 
-// startConfigReloader loads and periodically reloads the settings
+// loads settings once and then every 10s
 func startConfigReloader() {
 	if err := config.LoadSettings(); err != nil {
 		fmt.Printf("Failed to load settings: %v\n", err)
 		os.Exit(1)
 	}
-
 	go func() {
 		for {
 			time.Sleep(10 * time.Second)
@@ -81,17 +80,15 @@ func startConfigReloader() {
 	}()
 }
 
-// Run initializes and starts the monitor and WebSocket server
 func Run(ctx context.Context, cfg *Config) {
-
 	_ = godotenv.Load()
 
-	// Create DB if DB_URL/DB_HOST present (enables “run without DB” too)
+	// Optional DB
 	var db *storage.DB
 	if os.Getenv("DB_URL") != "" || os.Getenv("DB_HOST") != "" {
 		d, err := storage.New(context.Background())
 		if err != nil {
-			panic(err) // or log.Fatal
+			panic(err)
 		}
 		db = d
 		defer db.Pool.Close()
@@ -100,45 +97,42 @@ func Run(ctx context.Context, cfg *Config) {
 		fmt.Println("[DB] Skipped (no DB_URL/DB_HOST set)")
 	}
 
+	// Monitor + WS server
 	monitor := services.NewMonitorService(cfg.Hosts)
 	server := ws.NewWebSocketServer(monitor.GetMetricsStore())
 
 	mux := http.NewServeMux()
-
-	// WS + API
 	mux.HandleFunc("/ws", server.HandleConnections)
-	mux.HandleFunc("/api/threshold", threshold.ThresholdHandler)
+	mux.HandleFunc("/api/threshold", handlers.ThresholdHandler)
 
-	// Serve Angular dist from backend/web with SPA fallback
-	webDir := "web"
-	fs := http.FileServer(http.Dir(webDir))
-	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		p := webDir + r.URL.Path
-		if info, err := os.Stat(p); err == nil && !info.IsDir() {
-			fs.ServeHTTP(w, r)
-			return
-		}
-		http.ServeFile(w, r, webDir+"/index.html")
-	}))
+	// Serve embedded Angular app at "/"
+	spa, err := handlers.SPA()
+	if err != nil {
+		panic(err)
+	}
+	mux.Handle("/", spa)
 
-	httpServer := &http.Server{Addr: "0.0.0.0" + cfg.WSPort, Handler: mux}
+	httpServer := &http.Server{
+		Addr:    "0.0.0.0" + cfg.WSPort,
+		Handler: mux,
+	}
 
-	// WebSocket broadcaster
+	// broadcast metrics to WS clients
 	go server.StartBroadcasting(ctx)
 
-	// Start HTTP
+	// start HTTP server
 	go func() {
-		fmt.Printf("WebSocket server started on %s\n", cfg.WSPort)
+		fmt.Printf("HTTP server started on %s\n", cfg.WSPort)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Printf("WebSocket server error: %v\n", err)
+			fmt.Printf("HTTP server error: %v\n", err)
 		}
 	}()
 
-	// Start monitor
+	// start monitoring loop
 	fmt.Printf("Monitoring hosts: %v every %v on port %d\n", cfg.Hosts, cfg.Interval, cfg.Port)
 	go monitor.Start(cfg.Port, cfg.Interval)
 
-	// If DB is enabled, persist events
+	// persist to DB if enabled
 	if db != nil {
 		go persistLoop(ctx, monitor, db)
 	}
@@ -158,7 +152,6 @@ func main() {
 	if cfg == nil {
 		return
 	}
-
 	startConfigReloader()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

@@ -1,4 +1,4 @@
-package threshold
+package handlers
 
 import (
 	"encoding/json"
@@ -22,19 +22,17 @@ func ThresholdHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid threshold range", http.StatusBadRequest)
 			return
 		}
-
 		if err := config.UpdateSettings(config.Settings{LatencyThreshold: req.Threshold}); err != nil {
 			http.Error(w, "Failed to update threshold", http.StatusInternalServerError)
 			return
 		}
-
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
 	if r.Method == http.MethodGet {
 		current := config.GetThreshold()
-		json.NewEncoder(w).Encode(map[string]int{"threshold": current})
+		_ = json.NewEncoder(w).Encode(map[string]int{"threshold": current})
 		return
 	}
 
