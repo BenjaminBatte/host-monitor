@@ -12,14 +12,14 @@ type MonitorService struct {
 	hosts   []string
 	metrics *MetricsStore
 
-	events chan CheckEvent // 👈 add this
+	events chan CheckEvent
 }
 
 func NewMonitorService(hosts []string) *MonitorService {
 	return &MonitorService{
 		hosts:   hosts,
 		metrics: NewMetricsStore(),
-		events:  make(chan CheckEvent, 1024), // 👈 buffered so we never block checks
+		events:  make(chan CheckEvent, 1024),
 	}
 }
 
