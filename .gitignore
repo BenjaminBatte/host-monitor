@@ -46,3 +46,9 @@ Thumbs.db
 backend/host-monitor
 scripts/ping-many.sh
 
+
+# build artifacts
+backend/host-monitor
+
+# build artifacts
+backend/host-monitor
