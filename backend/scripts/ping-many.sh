@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export HOME=/tmp
+export GOMODCACHE=/tmp/gomod
+export GOCACHE=/tmp/gocache
+
 # Load .env safely (optional; ignored if missing)
 if [ -f .env ]; then
   echo "[ping-many] Loading environment variables from .env"
