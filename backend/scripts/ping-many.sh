@@ -51,4 +51,6 @@ echo "[ping-many] Monitoring hosts: $HOSTS"
 echo "[ping-many] Port: $PORT | Interval: $INTERVAL | HTTP: $WSPORT"
 
 # Run Go backend (no DB)
+cd /opt/host-monitor/backend
+
 exec go run ./cmd/monitor --hosts="$HOSTS" --port="$PORT" --interval="$INTERVAL" --ws-port="$WSPORT"
