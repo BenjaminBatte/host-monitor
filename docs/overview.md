@@ -29,7 +29,7 @@ The tool continuously pings specified hosts on a given port and interval, collec
 * **Frontend:** Angular
 * **Live Communication:** WebSockets
 * **Containerization:** Docker
-* **Optional Deployment:** systemd service, Kubernetes manifests
+* **Optional Deployment:** systemd service
 
 ## Intended Audience
 

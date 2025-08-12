@@ -10,7 +10,7 @@ title: Technology Choices
 
 * **Performance and Efficiency** – Go is compiled, statically typed, and known for fast startup times and low memory usage, making it well-suited for a network monitoring tool.
 * **Concurrency Model** – Go’s goroutines and channels provide lightweight, built-in concurrency, ideal for handling multiple host pings in parallel.
-* **Company Alignment** – The target company uses Go, so choosing it ensures familiarity with their tech stack.
+* **Company Alignment** – Go (Golang) is already a core part of the company’s technology ecosystem, ensuring seamless integration with existing systems and developer familiarity.
 * **Personal Growth** – I wanted to learn a modern, low-level language, and Go provided a good blend of performance and simplicity.
 
 ## Why Angular for Frontend
