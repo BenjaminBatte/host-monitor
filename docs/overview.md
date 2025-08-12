@@ -41,3 +41,7 @@ This documentation is intended for:
 ---
 
 [⬅ Back to Home](./) | [Next → Architecture](architecture.md)
+
+---
+
+<sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

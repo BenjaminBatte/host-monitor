@@ -70,3 +70,6 @@ This page describes how Host Monitor is structured, how data flows through the s
 ---
 
 [⬅ Back to Setup](setup.md) | [Next → Maintenance](maintenance.md)
+---
+
+<sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

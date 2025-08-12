@@ -32,3 +32,6 @@ title: Technology Choices
 * **Integration Ready** – Works with CI/CD pipelines, Kubernetes, and cloud platforms.
 
 [⬅ Back to Home](./) | [Next → Overview](overview.md)
+---
+
+<sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

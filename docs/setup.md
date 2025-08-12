@@ -98,3 +98,7 @@ If you’re **not on Linux** (so you’re not using systemd), you can run it dir
    ```
 
 [⬅ Back to Home](./) | [Next → Usage](usage.md)
+
+---
+
+<sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

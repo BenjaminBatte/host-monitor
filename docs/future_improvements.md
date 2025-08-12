@@ -64,3 +64,6 @@ These enhancements will expand the system’s capabilities beyond real-time moni
 ---
 
 [⬅ Back to Home](./) | [Next → Overview](overview.md)
+---
+
+<sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>
