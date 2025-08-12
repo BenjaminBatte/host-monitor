@@ -94,7 +94,6 @@ host-monitor
 │   ├── tech.md
 │   └── usage.md
 ├── ui                      # Angular frontend
-│   ├── backend             # Dev proxy/backend integration
 │   ├── dist                # Production build output
 │   ├── node_modules        # Frontend dependencies
 │   ├── public              # Static assets
