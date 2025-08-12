@@ -16,7 +16,7 @@ This page describes how Host Monitor is structured, how data flows through the s
 
 ![Class Diagram — Key Components & Data](./diagrams/class-diagram-key-components-data.svg)
 
-**What’s shown:** Angular UI, WebSocket server, Go services (`MonitorService`, `MetricsStore`), persistence (PostgreSQL), and core data models.
+**What’s shown:** Angular UI, WebSocket server, Go services (`MonitorService`, `MetricsStore`), persistence (PostgreSQL), and core data models. The Angular UI is **embedded into the Go binary** using `go:embed` and served by the backend (no separate `backend/web` directory).
 
 ## Detailed Domain & Services
 
@@ -62,6 +62,29 @@ This page describes how Host Monitor is structured, how data flows through the s
 * Fail or latency > threshold → **Down**
 * Success with latency ≤ threshold → **Up**
 
+## Embedded UI (no `backend/web`)
+
+The production Angular build is embedded in the Go binary. At build time we copy the UI artifacts into the backend and embed them via `go:embed`:
+
+```text
+ui/dist/host-monitor-ui/browser/  →  backend/internal/handlers/dist/browser/
+```
+
+Example (in `internal/handlers/static.go`):
+
+```go
+//go:embed dist/browser/*
+var uiFS embed.FS
+var staticFS, _ = fs.Sub(uiFS, "dist/browser")
+// mux.Handle("/", http.FileServer(http.FS(staticFS)))
+```
+
+**Why:**
+
+* Single self‑contained binary (simpler deploys: systemd/Docker/K8s).
+* No drift between filesystem and served assets.
+* Safer defaults (read‑only embedded FS).
+
 ## Project Structure
 
 The Host Monitor repository is organized into the following main components:
@@ -73,13 +96,15 @@ host-monitor
 │   ├── cmd                 # Entry points (CLI / main)
 │   ├── deployments         # systemd, Docker, Kubernetes manifests
 │   ├── internal            # Core app modules (config, services, handlers, models, utils)
+│   │   ├── handlers
+│   │   │   └── dist
+│   │   │       └── browser # Embedded Angular UI (copied from ui/dist/host-monitor-ui/browser)
 │   ├── migrations          # SQL migrations for PostgreSQL
 │   ├── pkg                 # Reusable packages (ping, websocket, etc.)
 │   ├── scripts             # Helper scripts (e.g., ping-many.sh)
-│   ├── web                 # Embedded Angular UI (production build)
 │   ├── Dockerfile          # Backend container build
 │   ├── go.mod / go.sum     # Go dependencies
-│   ├── host-monitor        # Compiled binary (after build)
+│   ├── host-monitor        # Compiled binary (after build; git-ignored)
 │   ├── Makefile            # Build/install tasks
 │   └── README.md
 ├── docs                    # Documentation site
@@ -111,7 +136,7 @@ host-monitor
 **Key conventions:**
 
 * **backend/** contains the Go services, WebSocket server, metrics logic, and optional DB integration.
-* **ui/** is the Angular SPA, served separately in dev and embedded in the backend in production.
+* **ui/** is the Angular SPA, served separately in dev and **embedded into the backend in production** at `backend/internal/handlers/dist/browser`.
 * **docs/** is a MkDocs-style documentation site (the `.md` files you’re reading now).
 * **scripts/** has helper and deployment scripts (kept untracked in some cases for local overrides).
 * **deployments/** contains systemd, Docker Compose, and Kubernetes specs for easy deployment.
