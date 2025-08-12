@@ -44,3 +44,5 @@ Thumbs.db
 
 # ignore built binary
 backend/host-monitor
+scripts/ping-many.sh
+
