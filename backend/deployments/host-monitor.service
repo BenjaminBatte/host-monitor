@@ -8,13 +8,8 @@ Type=simple
 User=hostmonitor
 Group=hostmonitor
 
-EnvironmentFile=-/etc/host-monitor/host-monitor.env
-
-ExecStart=/usr/local/bin/host-monitor \
-  --hosts=${HOSTS} \
-  --port=${PORT} \
-  --interval=${INTERVAL} \
-  --ws-port=${WSPORT}
+ExecStart=/opt/host-monitor/backend/scripts/ping-many.sh
+WorkingDirectory=/opt/host-monitor/backend/scripts/
 
 Restart=always
 RestartSec=5
