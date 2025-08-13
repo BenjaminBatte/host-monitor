@@ -11,8 +11,7 @@ import (
 type MonitorService struct {
 	hosts   []string
 	metrics *MetricsStore
-
-	events chan CheckEvent
+	events  chan CheckEvent
 }
 
 func NewMonitorService(hosts []string) *MonitorService {
@@ -23,8 +22,7 @@ func NewMonitorService(hosts []string) *MonitorService {
 	}
 }
 
-// Read-only channel for consumers (DB writer, alerting, etc.)
-func (m *MonitorService) Events() <-chan CheckEvent { return m.events } // 👈 add this
+func (m *MonitorService) Events() <-chan CheckEvent { return m.events }
 
 func (m *MonitorService) CheckHost(host string, port int) (string, time.Duration, error) {
 	address := fmt.Sprintf("[%s]:%d", host, port)
@@ -36,7 +34,9 @@ func (m *MonitorService) CheckHost(host string, port int) (string, time.Duration
 	if err != nil {
 		return host, 0, err
 	}
-	conn.Close()
+	if conn != nil {
+		conn.Close()
+	}
 	return host, latency, nil
 }
 
@@ -58,18 +58,25 @@ func (m *MonitorService) monitorHost(h string, port int, interval time.Duration)
 		up := (err == nil) && (duration.Milliseconds() <= int64(threshold))
 
 		if up {
-			fmt.Printf("[%s] UP (latency: %v ms, threshold: %d ms)\n", h, duration.Milliseconds(), threshold)
+			fmt.Printf("[%s] UP (latency: %d ms, threshold: %d ms)\n", h, duration.Milliseconds(), threshold)
 			m.metrics.Update(h, duration, true)
-			conn.Close()
+			if conn != nil {
+				conn.Close()
+			}
 		} else {
-			fmt.Printf("[%s] DOWN (latency: %v ms, threshold: %d ms, err: %v)\n", h, duration.Milliseconds(), threshold, err)
+			fmt.Printf("[%s] DOWN (latency: %d ms, threshold: %d ms, err: %v)\n", h, duration.Milliseconds(), threshold, err)
 			m.metrics.Update(h, 0, false)
-			if err == nil {
+			if err == nil && conn != nil {
 				conn.Close()
 			}
 		}
 
-		// 👇 emit event (packet loss unknown for TCP check -> 0)
+		// Compute current window packet-loss from the model after recording this probe.
+		loss := 0.0
+		if cur := m.metrics.Get(h); cur != nil {
+			loss = cur.PacketLossWindow()
+		}
+
 		ev := CheckEvent{
 			Host: h,
 			Up:   up,
@@ -79,19 +86,20 @@ func (m *MonitorService) monitorHost(h string, port int, interval time.Duration)
 				}
 				return -1
 			}(),
-			PacketLoss: 0, // retun 0 for now as we are not checking packet loss in TCP. do research for future checks
+			PacketLoss: loss, // window loss %
 			CheckedAt:  time.Now().UTC(),
 		}
 		select {
 		case m.events <- ev:
 		default:
-			// channel full; drop to avoid blocking the probe loop
+			// drop event if channel is full to avoid blocking
 		}
 
 		time.Sleep(interval)
 	}
 }
 
+// Expose metrics for HTTP handlers, etc.
 func (m *MonitorService) GetMetricsStore() MetricsReader {
 	return m.metrics
 }
