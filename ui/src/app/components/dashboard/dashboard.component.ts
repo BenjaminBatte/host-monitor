@@ -21,7 +21,8 @@ import { HostCardComponent } from '../host-card/host-card.component';
 import { MetricsService } from '../../services/metrics.service';
 
 import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 
 const DEBOUNCE_DELAY = 100;
 
@@ -54,7 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isCompactMode = false;
   threshold = 70;
 
-  // Scroll helpers
+  
   showScrollTop = false;
 
   private destroy$ = new Subject<void>();
@@ -67,9 +68,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private zone: NgZone
   ) {}
 
-  /* ==== Lifecycle ==== */
+
   ngOnInit(): void {
-    // Live metrics subscription
+
     this.metricsService
       .getMetrics()
       .pipe(takeUntil(this.destroy$))
@@ -103,7 +104,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* ==== Scrolling / UX ==== */
+
 
   @HostListener('window:scroll')
   onWindowScroll() {
@@ -121,23 +122,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     window.scrollTo({ top: 0, behavior: this.scrollBehavior() });
   }
 
-scrollToHistory(): void {
-  setTimeout(() => {
-    document
-      .getElementById('history-section')
-      ?.scrollIntoView({ behavior: this.scrollBehavior() });
-  }, 50);
-}
+  scrollToHistory(): void {
+    setTimeout(() => {
+      document
+        .getElementById('history-section')
+        ?.scrollIntoView({ behavior: this.scrollBehavior() });
+    }, 50);
+  }
 
-scrollToHistoryTop(): void {
-  setTimeout(() => {
-    document
-      .getElementById('history-section')
-      ?.scrollIntoView({ behavior: this.scrollBehavior(), block: 'start' });
-  }, 50);
-}
+  scrollToHistoryTop(): void {
+    setTimeout(() => {
+      document
+        .getElementById('history-section')
+        ?.scrollIntoView({ behavior: this.scrollBehavior(), block: 'start' });
+    }, 50);
+  }
 
-  /* ==== Threshold (debounced) ==== */
+ 
   updateThreshold(): void {
     if (this.updateThresholdTimeout !== undefined) {
       window.clearTimeout(this.updateThresholdTimeout);
@@ -153,7 +154,6 @@ scrollToHistoryTop(): void {
     }, DEBOUNCE_DELAY);
   }
 
-  /* ==== CSV Export ==== */
   exportToCSV(): void {
     const headers = [
       'Host',
@@ -191,50 +191,125 @@ scrollToHistoryTop(): void {
     URL.revokeObjectURL(url);
   }
 
-  /* ==== Stats helpers ==== */
+
   getUpHostsCount(): number {
     return this.hostEntries.filter(([_, d]) => d.up).length;
   }
-
   getDownHostsCount(): number {
     return this.hostEntries.filter(([_, d]) => !d.up).length;
   }
+  get totalHosts(): number {
+    return this.hostEntries.length;
+  }
 
   /* ==== Chart config ==== */
-  public pieChartType: ChartType = 'pie';
-  public pieChartLabels: string[] = ['UP', 'DOWN'];
-  public pieChartData: ChartData<'pie'> = {
-    labels: this.pieChartLabels,
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective; 
+
+  pieChartPlugins = [DataLabelsPlugin];
+
+  pieChartData: ChartData<'doughnut'> = {
+    labels: ['Up', 'Down'],
     datasets: [
       {
         data: [0, 0],
         backgroundColor: ['#2ecc71', '#e74c3c'],
+        borderWidth: 0,
+        hoverOffset: 10,
       },
     ],
   };
-public pieChartOptions: ChartConfiguration<'pie'>['options'] = {
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: false
-};
 
-
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective<'pie'>;
+  pieChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '65%',
+    animation: { duration: 400, easing: 'easeOutQuart' },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const total = (ctx.dataset.data as number[]).reduce((a, b) => a + b, 0) || 1;
+            const val = ctx.parsed as number;
+            const pct = ((val / total) * 100).toFixed(1);
+            return `${ctx.label}: ${val} (${pct}%)`;
+          },
+        },
+      },
+      datalabels: {
+        color: '#2c3e50',
+        formatter: (value, ctx) => {
+          const data = ctx.dataset.data as number[];
+          const total = data.reduce((a, b) => a + b, 0) || 1;
+          const pct = (Number(value) / total) * 100;
+          return pct >= 5 ? `${pct.toFixed(0)}%` : '';
+        },
+   font: { weight: 700, size: 12 },
+        clamp: true,
+      },
+    },
+  };
 
   private updateChartData(): void {
     const up = this.getUpHostsCount();
     const down = this.getDownHostsCount();
     const current = this.pieChartData.datasets[0].data as number[];
     if (current[0] !== up || current[1] !== down) {
-      this.pieChartData.datasets[0].data = [up, down];
+  
+      (this.pieChartData.datasets[0].data as number[])[0] = up;
+      (this.pieChartData.datasets[0].data as number[])[1] = down;
+      // trigger redraw
       this.chart?.update();
     }
   }
 
-  /* ==== ngFor helpers ==== */
+overallAvailability(): number {
+  const totals = this.hostEntries.reduce((acc, [, d]) => {
+    acc.s += d.successCount || 0;
+    acc.t += d.totalChecks || 0;
+    return acc;
+  }, {s: 0, t: 0});
+  return totals.t ? (totals.s / totals.t) * 100 : 0;
+}
+
+
+overallLossPct(): number {
+  const a = this.overallAvailability();
+  return 100 - a;
+}
+
+avgLatencyMs(): number {
+  const vals = this.hostEntries
+    .filter(([, d]) => d.up && typeof d.latency === 'number')
+    .map(([, d]) => Number(d.latency));
+  if (!vals.length) return 0;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+
+topLoss(): Array<[string, number, number]> {
+  const items = this.hostEntries.map(([h, d]) => {
+    const t = d.totalChecks || 0;
+    const s = d.successCount || 0;
+    const avail = t ? (s / t) * 100 : 0;
+    const loss = 100 - avail;
+    return [h, avail, loss] as [string, number, number];
+  });
+  return items.sort((a, b) => b[2] - a[2]).slice(0, 5);
+}
+
+
+slowestHosts(): Array<[string, number]> {
+  const items = this.hostEntries
+    .filter(([, d]) => typeof d.latency === 'number' && d.latency !== null)
+    .map(([h, d]) => [h, Number(d.latency)] as [string, number]);
+  return items.sort((a, b) => b[1] - a[1]).slice(0, 5);
+}
+
+
   trackByHost = (index: number, item: [string, HostMetrics]) => item[0];
 
-  /* ==== Equality / Ordering ==== */
+ 
   private normalizeEntries(entries: Array<[string, HostMetrics]>) {
     return entries.sort((a, b) => a[0].localeCompare(b[0]));
   }

@@ -40,37 +40,120 @@
   </div>
 
   <!-- Threshold Settings -->
-  <div class="threshold-settings">
-    <label for="thresholdSlider" title="Slide to increase or decrease the latency threshold">
-      Latency Threshold: {{ threshold }} ms
-    </label>
+<div class="threshold-settings">
+  <label for="thresholdSlider" class="field-label">
+    Latency Threshold <span class="value">{{ threshold }} ms</span>
+    <button
+      type="button"
+      class="info-button"
+      title="Hosts with latency at or above this value are marked DOWN. Higher = more tolerant; lower = stricter. Changes apply to new checks immediately."
+      aria-label="What does latency threshold do?">
+      ⓘ
+    </button>
+  </label>
 
-    <input
-      type="range"
-      id="thresholdSlider"
-      [(ngModel)]="threshold"
-      min="1"
-      max="1000"
-      class="threshold-slider"
-      (input)="updateThreshold()"
-      title="Adjust to change latency threshold"
-    />
+  <small id="thresholdHelp" class="field-hint">
+    Hosts above this latency are marked <strong>DOWN</strong>. Higher = more tolerant; lower = stricter. Applies to new checks immediately.
+  </small>
+
+  <input
+    type="range"
+    id="thresholdSlider"
+    [(ngModel)]="threshold"
+    min="1"
+    max="3000"
+    class="threshold-slider"
+    (input)="updateThreshold()"
+    aria-describedby="thresholdHelp"
+    [attr.aria-valuetext]="threshold + ' milliseconds'"
+    title="Adjust the point at which a host is considered DOWN"
+  />
+
+
+  <div class="threshold-actions">
+    <button class="secondary-button" (click)="threshold = 100; updateThreshold()" title="Reset to a sane default">
+      Reset to 100 ms
+    </button>
+    <span class="hint-inline">Applies instantly to new checks; history isn’t changed.</span>
   </div>
+</div>
+
 
   <!-- Main Content -->
 
-  <div *ngIf="hostEntries.length > 0">
-    <!-- Chart -->
-    <h2 class="chart-heading">Host Availability Summary</h2>
-    <div class="chart-container">
+<h2 class="chart-heading">Host Availability Summary</h2>
+<p class="chart-subheading">Current split of monitored hosts</p>
+
+<div class="summary-row">
+  <!-- Left: doughnut chart (your current chart block) -->
+  <div class="summary-col">
+    <div class="chart-container with-center">
       <canvas
         baseChart
         [data]="pieChartData"
-        [labels]="pieChartLabels"
-        type="pie"
-        [options]="pieChartOptions">
+        [options]="pieChartOptions"
+        [plugins]="pieChartPlugins"
+        [type]="'doughnut'">
       </canvas>
+      <div class="chart-center">
+        <div class="chart-center-big">{{ totalHosts }}</div>
+        <div class="chart-center-small">hosts</div>
+      </div>
+      <div class="legend-inline">
+        <span class="legend-chip up"></span>
+        <span class="legend-text">Up {{ getUpHostsCount() }}</span>
+        <span class="legend-spacer"></span>
+        <span class="legend-chip down"></span>
+        <span class="legend-text">Down {{ getDownHostsCount() }}</span>
+      </div>
     </div>
+  </div>
+
+  <!-- Right: stack of small cards -->
+  <div class="summary-col right">
+    <!-- Key metrics -->
+    <div class="mini-card">
+      <h3>Key Metrics</h3>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Availability</div>
+          <div class="kpi-value">{{ overallAvailability() | number:'1.0-1' }}%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Avg Latency</div>
+          <div class="kpi-value">{{ avgLatencyMs() | number:'1.0-0' }} ms</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Loss</div>
+          <div class="kpi-value">{{ overallLossPct() | number:'1.0-1' }}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top packet loss -->
+    <div class="mini-card">
+      <h3>Top Packet Loss</h3>
+      <ul class="list">
+        <li *ngFor="let item of topLoss()">
+          <span class="host">{{ item[0] }}</span>
+          <span class="metric">{{ item[2] | number:'1.0-1' }}%</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Slowest hosts -->
+    <div class="mini-card">
+      <h3>Slowest Hosts</h3>
+      <ul class="list">
+        <li *ngFor="let item of slowestHosts()">
+          <span class="host">{{ item[0] }}</span>
+          <span class="metric">{{ item[1] }} ms</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 
    
 <!-- Host Cards Section -->
@@ -136,7 +219,7 @@
       </div>
     </div>
   </div>
-</div>
+
 
 <!-- Floating Back-to-Top FAB -->
 <button
