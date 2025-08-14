@@ -4,7 +4,7 @@ title: Operations & Maintenance
 
 ---
 
-[⬅ Back to Home](./) | [Start → Overview](overview.md)  | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[⬅ Back to Home](./) | [Overview](overview.md)  | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 
 # Operations & Maintenance
@@ -71,7 +71,7 @@ docker restart host-monitor
 make build
 ```
 
-[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 ---
 

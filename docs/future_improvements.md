@@ -2,7 +2,7 @@
 title: Future Improvements
 ---
 
-[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[⬅ Back to Home](./) | [Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 ---
 
@@ -64,7 +64,7 @@ These enhancements will expand the system’s capabilities beyond real-time moni
 
 ---
 
-[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md)
+[Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md)
 ---
 
 <sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

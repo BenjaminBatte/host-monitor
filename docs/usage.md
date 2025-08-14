@@ -2,7 +2,7 @@
 ## title: Usage
 ---
 
-[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Architecture](architecture.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[⬅ Back to Home](./) | [Overview](overview.md) | [Architecture](architecture.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 
 # Usage
@@ -58,6 +58,6 @@ Click the copy icon on any host card to instantly copy its connection details to
 
 ![Copy to clipboard on host card](images/copy_to_clipboad.png)
 
- [Start → Architecture](architecture.md) | [Setup](setup.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+ [Architecture](architecture.md) | [Setup](setup.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 <sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

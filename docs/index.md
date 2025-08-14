@@ -2,7 +2,7 @@
 ## title: Host Monitor Documentation
 ---
 
-[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 # 📡 Host Monitor
 
@@ -42,6 +42,6 @@
 
 ---
 
-[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 <sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

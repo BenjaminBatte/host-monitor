@@ -2,7 +2,7 @@
 title: Setup
 ---
 
-[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+[⬅ Back to Home](./) | [Overview](overview.md) | [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 
 # Setup
@@ -98,7 +98,7 @@ If you’re **not on Linux** (so you’re not using systemd), you can run it dir
    http://localhost:9090
    ```
 
- [Start → Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+ [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 
 ---

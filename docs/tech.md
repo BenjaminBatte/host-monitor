@@ -3,7 +3,7 @@ title: Technology Choices
 ---
 
 
-[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
+[⬅ Back to Home](./) | [Overview](overview.md) | [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
 
 
 # Technology Choices
@@ -33,7 +33,7 @@ title: Technology Choices
 * **Simplified Deployment** – Easy to spin up both backend and frontend in isolated containers.
 * **Integration Ready** – Works with CI/CD pipelines, Kubernetes, and cloud platforms.
 
- [Start → Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
+ [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
 
 ---
 
