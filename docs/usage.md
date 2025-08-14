@@ -14,7 +14,6 @@ Once the Host Monitor service is running:
 Open the web dashboard in your browser:
 
 * **Production (embedded UI):** `http://<server>:9090/`
-* **Local development (Angular):** `http://localhost:4200/`
 
 ![Dashboard overview](images/dashboard.png)
 
