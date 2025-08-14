@@ -2,7 +2,9 @@
 title: Technology Choices
 ---
 
-[⬅ Back to Home](./) | [Next → Overview](overview.md)
+
+[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Architecture](architecture.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
+
 
 # Technology Choices
 
@@ -31,7 +33,8 @@ title: Technology Choices
 * **Simplified Deployment** – Easy to spin up both backend and frontend in isolated containers.
 * **Integration Ready** – Works with CI/CD pipelines, Kubernetes, and cloud platforms.
 
-[⬅ Back to Home](./) | [Next → Overview](overview.md)
+ [Start → Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Future Improvements](future_improvements.md)
+
 ---
 
 <sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

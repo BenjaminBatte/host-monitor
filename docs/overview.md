@@ -2,7 +2,8 @@
 title: Overview
 ---
 
-[⬅ Back to Home](./) | [Next → Architecture](architecture.md)
+[⬅ Back to Home](./) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+
 
 # Overview
 
@@ -40,7 +41,7 @@ This documentation is intended for:
 
 ---
 
-[⬅ Back to Home](./) | [Next → Architecture](architecture.md)
+ [Start → Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 ---
 

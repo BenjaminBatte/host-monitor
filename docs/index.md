@@ -1,10 +1,8 @@
 ---
-
-title: Host Monitor Documentation
-
+## title: Host Monitor Documentation
 ---
 
-[Start → Overview](overview.md)
+[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 # 📡 Host Monitor
 
@@ -15,10 +13,6 @@ title: Host Monitor Documentation
 ![Go](https://img.shields.io/badge/Go-1.22%2B-blue)
 ![Angular](https://img.shields.io/badge/Angular-17-red)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue)
-
-<!-- Optional: hero preview image -->
-
-<!-- ![Dashboard Preview](images/preview.png) -->
 
 **Quick Start:** [Install & Run → Setup](setup.md)
 
@@ -34,6 +28,7 @@ title: Host Monitor Documentation
 * **Deployment**
 
   * [Setup](setup.md)
+  * [Usage](usage.md)
   * [Maintenance](maintenance.md)
 
 * **Reference**
@@ -46,5 +41,7 @@ title: Host Monitor Documentation
 [**Get Started** → Overview](overview.md)
 
 ---
+
+[Start → Overview](overview.md) | [Architecture](architecture.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 <sub>© 2025 Host Monitor • <a href="https://github.com/BenjaminBatte/host-monitor">GitHub Repo</a></sub>

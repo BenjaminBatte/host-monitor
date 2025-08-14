@@ -4,7 +4,8 @@
 
 ---
 
-[⬅ Back to Home](./) | [Next → Usage](usage.md) | [→ Setup](setup.md)
+[⬅ Back to Home](./) | [Start → Overview](overview.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
+
 
 ---
 
@@ -148,7 +149,7 @@ host-monitor
 
 ---
 
-[⬅ Back to Setup](setup.md) | [Next → Maintenance](maintenance.md)
+[Start → Overview](overview.md) | [Setup](setup.md) | [Usage](usage.md) | [Maintenance](maintenance.md) | [Technology Choices](tech.md) | [Future Improvements](future_improvements.md)
 
 ---
 
